@@ -1,6 +1,3 @@
--- Enable UUID extension
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 -- Users profile (extends auth.users)
 CREATE TABLE profiles (
   id UUID REFERENCES auth.users(id) PRIMARY KEY,
@@ -13,7 +10,7 @@ CREATE TABLE profiles (
 
 -- Organizations (multi-tenancy)
 CREATE TABLE organizations (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   name TEXT NOT NULL,
   slug TEXT UNIQUE NOT NULL,
   owner_id UUID REFERENCES profiles(id) NOT NULL,
@@ -25,7 +22,7 @@ CREATE TABLE organizations (
 
 -- Organization members
 CREATE TABLE organization_members (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
   role TEXT DEFAULT 'member' CHECK (role IN ('owner', 'admin', 'member')),
@@ -35,7 +32,7 @@ CREATE TABLE organization_members (
 
 -- Solutions (core entity)
 CREATE TABLE solutions (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
   description TEXT,
@@ -50,7 +47,7 @@ CREATE TABLE solutions (
 
 -- Solution templates
 CREATE TABLE solution_templates (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   name TEXT NOT NULL,
   description TEXT,
   category TEXT NOT NULL,
@@ -62,7 +59,7 @@ CREATE TABLE solution_templates (
 
 -- Analytics events
 CREATE TABLE analytics_events (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
   event_type TEXT NOT NULL,
   event_data JSONB DEFAULT '{}',
