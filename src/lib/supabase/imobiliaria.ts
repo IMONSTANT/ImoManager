@@ -46,11 +46,16 @@ export async function getPessoas(
   let query = client
     .from('pessoa')
     .select(`
-      *,
-      profissao:profissao_id (*),
-      endereco:endereco_id (*)
+      id,
+      nome,
+      cpf,
+      email,
+      telefone,
+      data_nascimento,
+      profissao:profissao_id (id, descricao)
     `, { count: 'exact' })
     .is('deleted_at', null)
+    .order('criado_em', { ascending: false })
 
   if (params?.sortBy) {
     query = query.order(params.sortBy, {
@@ -159,7 +164,7 @@ export async function getLocadores(client: SupabaseClient) {
       pessoa:pessoa_id (*)
     `)
     .is('deleted_at', null)
-    .order('created_at', { ascending: false })
+    .order('criado_em', { ascending: false })
 
   if (error) throw error
   return data
@@ -234,7 +239,7 @@ export async function getLocatarios(client: SupabaseClient) {
       pessoa:pessoa_id (*)
     `)
     .is('deleted_at', null)
-    .order('created_at', { ascending: false })
+    .order('criado_em', { ascending: false })
 
   if (error) throw error
   return data
@@ -309,7 +314,7 @@ export async function getFiadores(client: SupabaseClient) {
       pessoa:pessoa_id (*)
     `)
     .is('deleted_at', null)
-    .order('created_at', { ascending: false })
+    .order('criado_em', { ascending: false })
 
   if (error) throw error
   return data
@@ -381,7 +386,7 @@ export async function getEnderecos(client: SupabaseClient) {
     .from('endereco')
     .select('*')
     .is('deleted_at', null)
-    .order('created_at', { ascending: false })
+    .order('criado_em', { ascending: false })
 
   if (error) throw error
   return data
@@ -502,7 +507,7 @@ export async function getImoveis(
       ascending: params.sortOrder === 'asc'
     })
   } else {
-    query = query.order('created_at', { ascending: false })
+    query = query.order('criado_em', { ascending: false })
   }
 
   if (params?.page && params?.limit) {
@@ -595,7 +600,7 @@ export async function getEmpresasCliente(client: SupabaseClient) {
       imovel:imovel_id (*)
     `)
     .is('deleted_at', null)
-    .order('created_at', { ascending: false })
+    .order('criado_em', { ascending: false })
 
   if (error) throw error
   return data
@@ -719,7 +724,7 @@ export async function getContratos(
       ascending: params.sortOrder === 'asc'
     })
   } else {
-    query = query.order('created_at', { ascending: false })
+    query = query.order('criado_em', { ascending: false })
   }
 
   if (params?.page && params?.limit) {
