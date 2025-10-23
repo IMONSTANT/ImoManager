@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { useImoveis, useTiposImovel } from '@/hooks/useImobiliaria'
+import { useImoveis, useTiposImovel, useDeleteImovel } from '@/hooks/useImobiliaria'
 import { formatCurrency, formatArea } from '@/lib/utils/formatters'
 import { ImovelFiltros } from '@/types/imobiliaria'
+import { toast } from 'sonner'
 import {
   Table,
   TableBody,
@@ -40,9 +41,22 @@ export function ImoveisTable() {
 
   const { data, isLoading, error } = useImoveis(filtros)
   const { data: tiposImovel } = useTiposImovel()
+  const deleteMutation = useDeleteImovel()
 
   const imoveis = data?.data || []
   const total = data?.count || 0
+
+  const handleDelete = async (id: number) => {
+    if (!confirm('Tem certeza que deseja excluir este imóvel?')) return
+
+    try {
+      await deleteMutation.mutateAsync(id)
+      toast.success('Imóvel excluído com sucesso!')
+    } catch (error: any) {
+      console.error('Erro ao excluir imóvel:', error)
+      toast.error(error.message || 'Erro ao excluir imóvel')
+    }
+  }
 
   if (error) {
     return (
@@ -109,11 +123,17 @@ export function ImoveisTable() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="todos">Todos os tipos</SelectItem>
-                    {tiposImovel?.map((tipo) => (
-                      <SelectItem key={tipo.id} value={tipo.id.toString()}>
-                        {tipo.descricao}
+                    {!tiposImovel || tiposImovel.length === 0 ? (
+                      <SelectItem value="none" disabled>
+                        Não cadastrado
                       </SelectItem>
-                    ))}
+                    ) : (
+                      tiposImovel.map((tipo) => (
+                        <SelectItem key={tipo.id} value={tipo.id.toString()}>
+                          {tipo.descricao}
+                        </SelectItem>
+                      ))
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -345,6 +365,8 @@ export function ImoveisTable() {
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8 text-destructive"
+                          onClick={() => handleDelete(imovel.id)}
+                          disabled={deleteMutation.isPending}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>

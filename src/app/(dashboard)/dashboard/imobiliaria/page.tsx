@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function ImobiliariaDashboard() {
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="flex flex-col gap-6 p-8 pt-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -101,7 +101,7 @@ function QuickAccessCard({
 }) {
   return (
     <Link href={href} className="block group">
-      <div className="rounded-lg border bg-card p-4 hover:shadow-md hover:border-primary transition-all">
+      <div className="rounded-lg border bg-background p-4 hover:shadow-md hover:border-primary transition-all">
         <div className="flex items-center gap-3">
           <div className={`rounded-lg bg-primary/10 p-2.5 ${iconColor}`}>
             <Icon className="h-5 w-5" />

@@ -21,7 +21,7 @@ export default async function UsersPage() {
   }
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="flex-1 space-y-6 p-8 pt-6">
       <div className="flex flex-col space-y-4">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Users</h2>

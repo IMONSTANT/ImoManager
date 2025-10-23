@@ -28,8 +28,8 @@ export default function SolutionsPage() {
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="flex justify-between items-center mb-8">
+    <div className="flex-1 space-y-6 p-8 pt-6">
+      <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Solutions</h1>
           <p className="text-muted-foreground">Manage your quick solutions</p>

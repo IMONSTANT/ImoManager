@@ -143,7 +143,7 @@ function ContratoCard({
 
   return (
     <div className={`rounded-lg border p-4 hover:bg-accent transition-colors ${
-      urgente ? 'border-red-200 bg-red-50/50' : 'bg-card'
+      urgente ? 'border-red-200 bg-red-50' : 'bg-background'
     }`}>
       <div className="flex items-start justify-between mb-2">
         <div className="flex-1">

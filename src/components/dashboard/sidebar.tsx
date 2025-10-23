@@ -5,19 +5,21 @@ import { usePathname } from "next/navigation"
 import {
   LayoutDashboard,
   Building2,
-  TrendingUp,
   Users,
-  Settings,
   LogOut,
-  Wallet,
-  BarChart3,
+  FileText,
+  Home,
+  UserCheck,
+  UserX,
+  Briefcase,
+  X,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { Badge } from "@/components/ui/badge"
+import { useSidebarStore } from "@/store/sidebar-store"
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   userEmail?: string
@@ -25,6 +27,7 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function Sidebar({ className, userEmail }: SidebarProps) {
   const pathname = usePathname()
+  const { close } = useSidebarStore()
 
   const routes = [
     {
@@ -34,49 +37,69 @@ export function Sidebar({ className, userEmail }: SidebarProps) {
       active: pathname === "/dashboard",
     },
     {
-      label: "Meus Imóveis",
+      label: "Imobiliária",
       icon: Building2,
-      href: "/dashboard/properties",
-      active: pathname === "/dashboard/properties",
-      badge: "12",
+      href: "/dashboard/imobiliaria",
+      active: pathname === "/dashboard/imobiliaria",
+    },
+  ]
+
+  const imobiliariaRoutes = [
+    {
+      label: "Imóveis",
+      icon: Home,
+      href: "/dashboard/imobiliaria/imoveis",
+      active: pathname?.startsWith("/dashboard/imobiliaria/imoveis"),
     },
     {
-      label: "Investimentos",
-      icon: TrendingUp,
-      href: "/dashboard/investments",
-      active: pathname === "/dashboard/investments",
+      label: "Contratos",
+      icon: FileText,
+      href: "/dashboard/imobiliaria/contratos",
+      active: pathname?.startsWith("/dashboard/imobiliaria/contratos"),
     },
     {
-      label: "Analytics",
-      icon: BarChart3,
-      href: "/dashboard/analytics",
-      active: pathname === "/dashboard/analytics",
+      label: "Pessoas",
+      icon: Users,
+      href: "/dashboard/imobiliaria/pessoas",
+      active: pathname?.startsWith("/dashboard/imobiliaria/pessoas"),
     },
     {
-      label: "Carteira",
-      icon: Wallet,
-      href: "/dashboard/portfolio",
-      active: pathname === "/dashboard/portfolio",
+      label: "Locadores",
+      icon: UserCheck,
+      href: "/dashboard/imobiliaria/locadores",
+      active: pathname?.startsWith("/dashboard/imobiliaria/locadores"),
+    },
+    {
+      label: "Locatários",
+      icon: UserX,
+      href: "/dashboard/imobiliaria/locatarios",
+      active: pathname?.startsWith("/dashboard/imobiliaria/locatarios"),
+    },
+    {
+      label: "Empresas",
+      icon: Briefcase,
+      href: "/dashboard/imobiliaria/empresas",
+      active: pathname?.startsWith("/dashboard/imobiliaria/empresas"),
     },
   ]
 
   const secondaryRoutes = [
     {
-      label: "Usuários",
+      label: "Soluções",
+      icon: FileText,
+      href: "/dashboard/solutions",
+      active: pathname === "/dashboard/solutions",
+    },
+    {
+      label: "Usuários Sistema",
       icon: Users,
       href: "/dashboard/users",
       active: pathname === "/dashboard/users",
     },
-    {
-      label: "Configurações",
-      icon: Settings,
-      href: "/dashboard/settings",
-      active: pathname === "/dashboard/settings",
-    },
   ]
 
   return (
-    <div className={cn("pb-12 min-h-screen bg-card border-r", className)}>
+    <div className={cn("pb-12 min-h-screen bg-background border-r", className)}>
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
           <div className="flex items-center justify-between mb-6 px-4">
@@ -88,7 +111,18 @@ export function Sidebar({ className, userEmail }: SidebarProps) {
                 Beeing Rich
               </h2>
             </div>
-            <ThemeToggle />
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={close}
+                className="md:hidden h-8 w-8"
+                aria-label="Fechar menu"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
           <Separator className="mb-4" />
 
@@ -97,6 +131,7 @@ export function Sidebar({ className, userEmail }: SidebarProps) {
               <Link
                 key={route.href}
                 href={route.href}
+                onClick={close}
                 className={cn(
                   "flex items-center gap-x-3 text-sm font-medium transition-all px-3 py-3 rounded-lg group",
                   route.active
@@ -109,11 +144,33 @@ export function Sidebar({ className, userEmail }: SidebarProps) {
                   route.active ? "" : "group-hover:scale-110 transition-transform"
                 )} />
                 <span className="flex-1">{route.label}</span>
-                {route.badge && (
-                  <Badge variant="secondary" className="ml-auto h-5 px-2 text-xs">
-                    {route.badge}
-                  </Badge>
+              </Link>
+            ))}
+          </div>
+
+          <Separator className="my-4" />
+
+          <div className="px-3 mb-2">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Gestão Imobiliária
+            </p>
+          </div>
+
+          <div className="space-y-1">
+            {imobiliariaRoutes.map((route) => (
+              <Link
+                key={route.href}
+                href={route.href}
+                onClick={close}
+                className={cn(
+                  "flex items-center gap-x-3 text-sm font-medium transition-all px-3 py-2 rounded-lg",
+                  route.active
+                    ? "bg-accent text-accent-foreground"
+                    : "text-muted-foreground hover:bg-accent/50"
                 )}
+              >
+                <route.icon className="h-4 w-4" />
+                {route.label}
               </Link>
             ))}
           </div>
@@ -125,6 +182,7 @@ export function Sidebar({ className, userEmail }: SidebarProps) {
               <Link
                 key={route.href}
                 href={route.href}
+                onClick={close}
                 className={cn(
                   "flex items-center gap-x-3 text-sm font-medium transition-all px-3 py-2.5 rounded-lg",
                   route.active
@@ -142,7 +200,7 @@ export function Sidebar({ className, userEmail }: SidebarProps) {
         <Separator />
 
         <div className="px-3 py-2">
-          <div className="px-3 py-3 text-sm bg-muted/50 rounded-lg mb-3">
+          <div className="px-3 py-3 text-sm bg-muted rounded-lg mb-3">
             <p className="text-xs text-muted-foreground mb-1">Conectado como</p>
             <p className="font-medium truncate">{userEmail}</p>
           </div>
