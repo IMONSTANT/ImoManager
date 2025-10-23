@@ -138,13 +138,13 @@ export function ContratoForm({ initialData, contratoId, onSuccess }: ContratoFor
         dia_vencimento: parseInt(data.dia_vencimento),
         indice_reajuste: data.indice_reajuste || 'IGPM',
         periodicidade_reajuste: data.periodicidade_reajuste ? parseInt(data.periodicidade_reajuste) : 12,
-        observacoes: data.observacoes,
-        clausulas_especiais: data.clausulas_especiais,
+        observacoes: data.observacoes || null,
+        clausulas_especiais: data.clausulas_especiais || null,
       }
 
       if (contratoId) {
         // Modo de edição
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('contrato_locacao')
           .update(contratoData)
           .eq('id', contratoId)
@@ -154,7 +154,7 @@ export function ContratoForm({ initialData, contratoId, onSuccess }: ContratoFor
         toast.success('Contrato atualizado com sucesso!')
       } else {
         // Modo de criação
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('contrato_locacao')
           .insert({
             ...contratoData,
@@ -165,7 +165,7 @@ export function ContratoForm({ initialData, contratoId, onSuccess }: ContratoFor
         if (error) throw error
 
         // Atualizar disponibilidade do imóvel
-        await supabase
+        await (supabase as any)
           .from('imovel')
           .update({ disponivel: false })
           .eq('id', parseInt(data.imovel_id))

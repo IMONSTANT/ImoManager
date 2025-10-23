@@ -99,15 +99,15 @@ export function Sidebar({ className, userEmail }: SidebarProps) {
   ]
 
   return (
-    <div className={cn("pb-12 min-h-screen bg-background border-r", className)}>
+    <div className={cn("pb-12 min-h-screen bg-background border-r shadow-sm backdrop-blur-none", className)}>
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
           <div className="flex items-center justify-between mb-6 px-4">
-            <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <Building2 className="h-5 w-5 text-white" />
+            <div className="flex items-center gap-2.5">
+              <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md">
+                <Building2 className="h-5 w-5 text-primary-foreground" />
               </div>
-              <h2 className="text-lg font-bold tracking-tight bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              <h2 className="text-lg font-bold tracking-tight bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
                 Beeing Rich
               </h2>
             </div>
@@ -117,7 +117,7 @@ export function Sidebar({ className, userEmail }: SidebarProps) {
                 variant="ghost"
                 size="icon"
                 onClick={close}
-                className="md:hidden h-8 w-8"
+                className="md:hidden h-9 w-9"
                 aria-label="Fechar menu"
               >
                 <X className="h-5 w-5" />
@@ -126,22 +126,22 @@ export function Sidebar({ className, userEmail }: SidebarProps) {
           </div>
           <Separator className="mb-4" />
 
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             {routes.map((route) => (
               <Link
                 key={route.href}
                 href={route.href}
                 onClick={close}
                 className={cn(
-                  "flex items-center gap-x-3 text-sm font-medium transition-all px-3 py-3 rounded-lg group",
+                  "flex items-center gap-x-3 text-sm font-medium transition-all duration-200 px-3 py-3 rounded-lg group",
                   route.active
-                    ? "bg-primary text-primary-foreground shadow-md"
-                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                    ? "bg-primary text-primary-foreground shadow-md hover:shadow-lg"
+                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground hover:shadow-sm"
                 )}
               >
                 <route.icon className={cn(
-                  "h-5 w-5",
-                  route.active ? "" : "group-hover:scale-110 transition-transform"
+                  "h-5 w-5 transition-transform duration-200",
+                  route.active ? "" : "group-hover:scale-110"
                 )} />
                 <span className="flex-1">{route.label}</span>
               </Link>
@@ -163,13 +163,16 @@ export function Sidebar({ className, userEmail }: SidebarProps) {
                 href={route.href}
                 onClick={close}
                 className={cn(
-                  "flex items-center gap-x-3 text-sm font-medium transition-all px-3 py-2 rounded-lg",
+                  "flex items-center gap-x-3 text-sm font-medium transition-all duration-200 px-3 py-2.5 rounded-lg group",
                   route.active
-                    ? "bg-accent text-accent-foreground"
-                    : "text-muted-foreground hover:bg-accent/50"
+                    ? "bg-accent text-accent-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
                 )}
               >
-                <route.icon className="h-4 w-4" />
+                <route.icon className={cn(
+                  "h-4 w-4 transition-transform duration-200",
+                  !route.active && "group-hover:scale-110"
+                )} />
                 {route.label}
               </Link>
             ))}

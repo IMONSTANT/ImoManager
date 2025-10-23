@@ -27,7 +27,7 @@ export function ImovelForm({ initialData, imovelId, onSuccess }: ImovelFormProps
   const updateMutation = useUpdateImovel()
 
   const form = useForm<ImovelFormData>({
-    resolver: zodResolver(imovelSchema),
+    resolver: zodResolver(imovelSchema) as any,
     defaultValues: initialData || {
       tipo_imovel_id: undefined,
       locador_id: undefined,
@@ -38,7 +38,8 @@ export function ImovelForm({ initialData, imovelId, onSuccess }: ImovelFormProps
       area_total: 0,
       valor_aluguel: 0,
       valor_condominio: 0,
-      iptu: 0
+      iptu: 0,
+      disponivel: true
     }
   })
 

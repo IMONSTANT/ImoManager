@@ -18,7 +18,7 @@ export default async function DashboardLayout({
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar Desktop */}
-      <aside className="hidden md:flex w-64 flex-col fixed inset-y-0 z-50 border-r bg-background">
+      <aside className="hidden md:flex w-64 flex-col fixed inset-y-0 z-50 border-r bg-background backdrop-blur-none">
         <Sidebar userEmail={user.email} />
       </aside>
 

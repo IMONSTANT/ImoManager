@@ -152,7 +152,7 @@ export function EmpresaForm({ initialData, empresaId, onSuccess }: EmpresaFormPr
 
       if (empresaId && initialData?.endereco_id) {
         // Modo de edição - atualizar endereço existente
-        const { error: enderecoError } = await supabase
+        const { error: enderecoError } = await (supabase as any)
           .from('endereco')
           .update(enderecoData)
           .eq('id', initialData.endereco_id)
@@ -161,7 +161,7 @@ export function EmpresaForm({ initialData, empresaId, onSuccess }: EmpresaFormPr
         enderecoId = initialData.endereco_id
       } else {
         // Modo de criação - criar novo endereço
-        const { data: newEndereco, error: enderecoError } = await supabase
+        const { data: newEndereco, error: enderecoError } = await (supabase as any)
           .from('endereco')
           .insert(enderecoData)
           .select()
@@ -189,7 +189,7 @@ export function EmpresaForm({ initialData, empresaId, onSuccess }: EmpresaFormPr
 
       if (empresaId) {
         // Modo de edição
-        const { error: empresaError } = await supabase
+        const { error: empresaError } = await (supabase as any)
           .from('empresa_cliente')
           .update(empresaData)
           .eq('id', empresaId)
@@ -198,7 +198,7 @@ export function EmpresaForm({ initialData, empresaId, onSuccess }: EmpresaFormPr
         toast.success('Empresa atualizada com sucesso!')
       } else {
         // Modo de criação
-        const { error: empresaError } = await supabase
+        const { error: empresaError } = await (supabase as any)
           .from('empresa_cliente')
           .insert(empresaData)
 

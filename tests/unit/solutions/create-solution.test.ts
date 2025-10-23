@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 import { useCreateSolution } from '@/hooks/use-solutions'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import React from 'react'
 
 const createWrapper = () => {
   const queryClient = new QueryClient({

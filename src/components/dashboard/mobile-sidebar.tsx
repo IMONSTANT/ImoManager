@@ -40,7 +40,7 @@ export function MobileSidebar({ userEmail }: MobileSidebarProps) {
   return (
     <>
       {/* Header Mobile com botão */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-background border-b z-40 flex items-center px-4 shadow-sm">
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-background border-b z-40 flex items-center px-4 shadow-sm backdrop-blur-none">
         <Button
           variant="outline"
           size="icon"
@@ -84,7 +84,7 @@ export function MobileSidebar({ userEmail }: MobileSidebarProps) {
       {/* Sidebar Mobile */}
       <aside
         className={`
-          md:hidden fixed inset-y-0 left-0 z-50 w-64 bg-background border-r
+          md:hidden fixed inset-y-0 left-0 z-50 w-64 bg-background border-r backdrop-blur-none
           transform transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
         `}

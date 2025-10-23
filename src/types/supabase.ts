@@ -131,6 +131,131 @@ export interface Database {
           updated_at?: string
         }
       }
+      contrato_locacao: {
+        Row: {
+          id: number
+          imovel_id: number
+          locatario_id: number
+          tipo_locacao_id: number
+          valor: number
+          caucao: number | null
+          valor_iptu: number | null
+          valor_condominio: number | null
+          data_inicio_contrato: string
+          data_fim_contrato: string
+          dia_vencimento: number
+          indice_reajuste: string
+          periodicidade_reajuste: number
+          observacoes: string | null
+          clausulas_especiais: string | null
+          status: string
+          contrato_assinado: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          imovel_id: number
+          locatario_id: number
+          tipo_locacao_id: number
+          valor: number
+          caucao?: number | null
+          valor_iptu?: number | null
+          valor_condominio?: number | null
+          data_inicio_contrato: string
+          data_fim_contrato: string
+          dia_vencimento: number
+          indice_reajuste?: string
+          periodicidade_reajuste?: number
+          observacoes?: string | null
+          clausulas_especiais?: string | null
+          status?: string
+          contrato_assinado?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          imovel_id?: number
+          locatario_id?: number
+          tipo_locacao_id?: number
+          valor?: number
+          caucao?: number | null
+          valor_iptu?: number | null
+          valor_condominio?: number | null
+          data_inicio_contrato?: string
+          data_fim_contrato?: string
+          dia_vencimento?: number
+          indice_reajuste?: string
+          periodicidade_reajuste?: number
+          observacoes?: string | null
+          clausulas_especiais?: string | null
+          status?: string
+          contrato_assinado?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      imovel: {
+        Row: {
+          id: number
+          codigo_imovel: string
+          disponivel: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          codigo_imovel: string
+          disponivel?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          codigo_imovel?: string
+          disponivel?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      locatario: {
+        Row: {
+          id: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      tipo_locacao: {
+        Row: {
+          id: number
+          descricao: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          descricao: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          descricao?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
   }
 }
