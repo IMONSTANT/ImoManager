@@ -27,7 +27,8 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
-import { Loader2, Save, X } from 'lucide-react'
+import { Loader2, Save, X, Plus, MapPin } from 'lucide-react'
+import Link from 'next/link'
 
 const empresaSchema = z.object({
   descricao: z.string().min(1, 'Informe a descrição/nome da empresa'),
@@ -39,16 +40,7 @@ const empresaSchema = z.object({
   email: z.string().email('Email inválido').optional().or(z.literal('')),
   telefone: z.string().optional(),
   contato_principal: z.string().optional(),
-  // Endereço
-  cep: z.string().min(1, 'Informe o CEP'),
-  logradouro: z.string().min(1, 'Informe o logradouro'),
-  numero: z.string().min(1, 'Informe o número'),
-  complemento: z.string().optional(),
-  bairro: z.string().min(1, 'Informe o bairro'),
-  cidade: z.string().min(1, 'Informe a cidade'),
-  uf: z.string().min(2, 'Informe a UF').max(2),
-  pais: z.string().optional(),
-  // Opcional
+  endereco_id: z.string().min(1, 'Selecione um endereço'),
   imovel_id: z.string().optional(),
   observacoes: z.string().optional(),
 })
@@ -65,6 +57,7 @@ export function EmpresaForm({ initialData, empresaId, onSuccess }: EmpresaFormPr
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [imoveis, setImoveis] = useState<any[]>([])
+  const [enderecos, setEnderecos] = useState<any[]>([])
   const supabase = createClient()
 
   const form = useForm<EmpresaFormValues>({
@@ -79,30 +72,24 @@ export function EmpresaForm({ initialData, empresaId, onSuccess }: EmpresaFormPr
       email: initialData.email || '',
       telefone: initialData.telefone || '',
       contato_principal: initialData.contato_principal || '',
-      cep: initialData.endereco?.cep || '',
-      logradouro: initialData.endereco?.logradouro || '',
-      numero: initialData.endereco?.numero || '',
-      complemento: initialData.endereco?.complemento || '',
-      bairro: initialData.endereco?.bairro || '',
-      cidade: initialData.endereco?.cidade || '',
-      uf: initialData.endereco?.uf || '',
-      pais: initialData.endereco?.pais || 'Brasil',
+      endereco_id: initialData.endereco_id?.toString() || '',
       imovel_id: initialData.imovel_id?.toString() || '',
       observacoes: initialData.observacoes || '',
-    } : {
-      pais: 'Brasil',
-    },
+    } : undefined,
   })
 
   useEffect(() => {
     fetchImoveis()
+    fetchEnderecos()
   }, [])
 
   async function fetchImoveis() {
     try {
       const { data, error } = await supabase
         .from('imovel')
-        .select('id, codigo_imovel, endereco:endereco(logradouro, numero)')
+        .select('id, codigo_imovel, endereco:endereco_id(logradouro, numero)')
+        .is('deleted_at', null)
+        .order('criado_em', { ascending: false })
 
       if (error) throw error
       setImoveis(data || [])
@@ -111,78 +98,36 @@ export function EmpresaForm({ initialData, empresaId, onSuccess }: EmpresaFormPr
     }
   }
 
-  async function buscarCEP(cep: string) {
+  async function fetchEnderecos() {
     try {
-      const cleanCEP = cep.replace(/\D/g, '')
-      if (cleanCEP.length !== 8) return
+      const { data, error } = await supabase
+        .from('endereco')
+        .select('*')
+        .is('deleted_at', null)
+        .order('criado_em', { ascending: false })
 
-      const response = await fetch(`https://viacep.com.br/ws/${cleanCEP}/json/`)
-      const data = await response.json()
-
-      if (data.erro) {
-        toast.error('CEP não encontrado')
-        return
-      }
-
-      form.setValue('logradouro', data.logradouro || '')
-      form.setValue('bairro', data.bairro || '')
-      form.setValue('cidade', data.localidade || '')
-      form.setValue('uf', data.uf || '')
+      if (error) throw error
+      setEnderecos(data || [])
     } catch (error) {
-      console.error('Erro ao buscar CEP:', error)
-      toast.error('Erro ao buscar CEP')
+      console.error('Erro ao carregar endereços:', error)
     }
   }
 
   async function onSubmit(data: EmpresaFormValues) {
     setLoading(true)
     try {
-      const enderecoData = {
-        cep: data.cep.replace(/\D/g, ''),
-        logradouro: data.logradouro,
-        numero: data.numero,
-        complemento: data.complemento,
-        bairro: data.bairro,
-        cidade: data.cidade,
-        uf: data.uf,
-        pais: data.pais || 'Brasil',
-      }
-
-      let enderecoId: number
-
-      if (empresaId && initialData?.endereco_id) {
-        // Modo de edição - atualizar endereço existente
-        const { error: enderecoError } = await (supabase as any)
-          .from('endereco')
-          .update(enderecoData)
-          .eq('id', initialData.endereco_id)
-
-        if (enderecoError) throw enderecoError
-        enderecoId = initialData.endereco_id
-      } else {
-        // Modo de criação - criar novo endereço
-        const { data: newEndereco, error: enderecoError } = await (supabase as any)
-          .from('endereco')
-          .insert(enderecoData)
-          .select()
-          .single()
-
-        if (enderecoError) throw enderecoError
-        enderecoId = newEndereco.id
-      }
-
       // Dados da empresa
       const empresaData = {
         descricao: data.descricao,
         razao_social: data.razao_social,
         nome_fantasia: data.nome_fantasia,
-        cnpj: data.cnpj ? data.cnpj.replace(/\D/g, '') : data.cnpj,
+        cnpj: data.cnpj ? data.cnpj.replace(/\D/g, '') : null,
         inscricao_estadual: data.inscricao_estadual,
         inscricao_municipal: data.inscricao_municipal,
-        endereco_id: enderecoId,
+        endereco_id: parseInt(data.endereco_id),
         imovel_id: data.imovel_id ? parseInt(data.imovel_id) : null,
         email: data.email,
-        telefone: data.telefone ? data.telefone.replace(/\D/g, '') : data.telefone,
+        telefone: data.telefone ? data.telefone.replace(/\D/g, '') : null,
         contato_principal: data.contato_principal,
         observacoes: data.observacoes,
       }
@@ -368,17 +313,12 @@ export function EmpresaForm({ initialData, empresaId, onSuccess }: EmpresaFormPr
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {imoveis.length === 0 ? (
-                        <SelectItem value="none" disabled>
-                          Não cadastrado
+                      <SelectItem value="">Nenhum</SelectItem>
+                      {imoveis.map((imovel) => (
+                        <SelectItem key={imovel.id} value={imovel.id.toString()}>
+                          {imovel.codigo_imovel} - {imovel.endereco?.logradouro}, {imovel.endereco?.numero}
                         </SelectItem>
-                      ) : (
-                        imoveis.map((imovel) => (
-                          <SelectItem key={imovel.id} value={imovel.id.toString()}>
-                            {imovel.codigo_imovel} - {imovel.endereco?.logradouro}, {imovel.endereco?.numero}
-                          </SelectItem>
-                        ))
-                      )}
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -391,127 +331,57 @@ export function EmpresaForm({ initialData, empresaId, onSuccess }: EmpresaFormPr
 
         <Card>
           <CardHeader>
-            <CardTitle>Endereço</CardTitle>
-            <CardDescription>Localização da empresa</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Endereço</CardTitle>
+                <CardDescription>Selecione o endereço da empresa</CardDescription>
+              </div>
+              <Link href="/dashboard/imobiliaria/enderecos/novo" target="_blank">
+                <Button type="button" variant="outline" size="sm">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Novo Endereço
+                </Button>
+              </Link>
+            </div>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <CardContent>
             <FormField
               control={form.control}
-              name="cep"
+              name="endereco_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>CEP *</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="00000-000"
-                      {...field}
-                      onBlur={(e) => buscarCEP(e.target.value)}
-                    />
-                  </FormControl>
+                  <FormLabel>Endereço *</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione um endereço" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {enderecos.length === 0 ? (
+                        <SelectItem value="none" disabled>
+                          Nenhum endereço cadastrado
+                        </SelectItem>
+                      ) : (
+                        enderecos.map((endereco) => (
+                          <SelectItem key={endereco.id} value={endereco.id.toString()}>
+                            <div className="flex items-center gap-2">
+                              <MapPin className="h-4 w-4" />
+                              {endereco.logradouro}, {endereco.numero} - {endereco.bairro}, {endereco.cidade}/{endereco.uf}
+                              {endereco.complemento && ` - ${endereco.complemento}`}
+                            </div>
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    Se o endereço não estiver cadastrado, clique em "Novo Endereço" acima
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            <FormField
-              control={form.control}
-              name="logradouro"
-              render={({ field }) => (
-                <FormItem className="md:col-span-2">
-                  <FormLabel>Logradouro *</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Rua, Avenida, etc." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="numero"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Número *</FormLabel>
-                  <FormControl>
-                    <Input placeholder="123" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="complemento"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Complemento</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Sala, Andar, etc." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="bairro"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Bairro *</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Bairro" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="cidade"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Cidade *</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Cidade" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="uf"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>UF *</FormLabel>
-                  <FormControl>
-                    <Input placeholder="SP" maxLength={2} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="pais"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>País</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Brasil" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
           </CardContent>
         </Card>
 
@@ -563,7 +433,7 @@ export function EmpresaForm({ initialData, empresaId, onSuccess }: EmpresaFormPr
             ) : (
               <>
                 <Save className="mr-2 h-4 w-4" />
-                Cadastrar Empresa
+                {empresaId ? 'Atualizar' : 'Cadastrar'} Empresa
               </>
             )}
           </Button>
