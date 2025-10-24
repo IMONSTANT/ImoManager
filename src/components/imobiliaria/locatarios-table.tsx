@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Edit, Trash2, FileText, Mail, Phone, DollarSign } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
@@ -76,13 +77,32 @@ export function LocatariosTable() {
   }
 
   if (loading) {
-    return <div className="text-center py-8">Carregando...</div>
-  }
-
-  if (locatarios.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
-        Nenhum locatário cadastrado
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nome</TableHead>
+              <TableHead>CPF</TableHead>
+              <TableHead>Renda Mensal</TableHead>
+              <TableHead>Contato</TableHead>
+              <TableHead>Contratos Ativos</TableHead>
+              <TableHead className="text-right">Ações</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {[...Array(5)].map((_, i) => (
+              <TableRow key={i}>
+                <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                <TableCell><Skeleton className="h-6 w-28" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                <TableCell><Skeleton className="h-8 w-32" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-12" /></TableCell>
+                <TableCell><Skeleton className="h-8 w-20" /></TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
     )
   }
@@ -101,7 +121,19 @@ export function LocatariosTable() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {locatarios.map((locatario) => (
+          {locatarios.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={6} className="h-24 text-center">
+                <div className="flex flex-col items-center gap-2">
+                  <FileText className="h-8 w-8 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">
+                    Nenhum locatário cadastrado
+                  </p>
+                </div>
+              </TableCell>
+            </TableRow>
+          ) : (
+            locatarios.map((locatario) => (
             <TableRow key={locatario.id}>
               <TableCell className="font-medium">
                 {locatario.pessoa?.nome}
@@ -147,20 +179,22 @@ export function LocatariosTable() {
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" aria-label="Editar locatário">
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => handleDelete(locatario.id)}
+                    aria-label="Excluir locatário"
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
                 </div>
               </TableCell>
             </TableRow>
-          ))}
+            ))
+          )}
         </TableBody>
       </Table>
     </div>

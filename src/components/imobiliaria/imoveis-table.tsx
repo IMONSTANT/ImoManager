@@ -340,14 +340,14 @@ export function ImoveisTable() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex gap-1 justify-end">
+                      <div className="flex gap-2 justify-end">
                         <Button
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8"
                           asChild
                         >
-                          <Link href={`/dashboard/imobiliaria/imoveis/${imovel.id}`}>
+                          <Link href={`/dashboard/imobiliaria/imoveis/${imovel.id}`} aria-label="Visualizar imóvel">
                             <Eye className="h-4 w-4" />
                           </Link>
                         </Button>
@@ -357,7 +357,7 @@ export function ImoveisTable() {
                           className="h-8 w-8"
                           asChild
                         >
-                          <Link href={`/dashboard/imobiliaria/imoveis/${imovel.id}/editar`}>
+                          <Link href={`/dashboard/imobiliaria/imoveis/${imovel.id}/editar`} aria-label="Editar imóvel">
                             <Edit className="h-4 w-4" />
                           </Link>
                         </Button>
@@ -367,6 +367,7 @@ export function ImoveisTable() {
                           className="h-8 w-8 text-destructive"
                           onClick={() => handleDelete(imovel.id)}
                           disabled={deleteMutation.isPending}
+                          aria-label="Excluir imóvel"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>

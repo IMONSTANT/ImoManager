@@ -32,7 +32,7 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
           // The global styles provide: color: hsl(var(--color-placeholder))
           "placeholder:opacity-100",
           // Focus States
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:border-ring",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:border-ring",
           // Disabled State
           "disabled:cursor-not-allowed disabled:opacity-50",
           // Hover State

@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Edit, Trash2, Building2, Mail, Phone } from 'lucide-react'
 import { LocadorCompleto } from '@/types/imobiliaria'
 import { createClient } from '@/lib/supabase/client'
@@ -69,13 +70,32 @@ export function LocadoresTable() {
   }
 
   if (loading) {
-    return <div className="text-center py-8">Carregando...</div>
-  }
-
-  if (locadores.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
-        Nenhum locador cadastrado
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nome</TableHead>
+              <TableHead>Tipo</TableHead>
+              <TableHead>CPF/CNPJ</TableHead>
+              <TableHead>Contato</TableHead>
+              <TableHead>Imóveis</TableHead>
+              <TableHead className="text-right">Ações</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {[...Array(5)].map((_, i) => (
+              <TableRow key={i}>
+                <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                <TableCell><Skeleton className="h-6 w-20" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-28" /></TableCell>
+                <TableCell><Skeleton className="h-8 w-32" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-12" /></TableCell>
+                <TableCell><Skeleton className="h-8 w-20" /></TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
     )
   }
@@ -94,7 +114,19 @@ export function LocadoresTable() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {locadores.map((locador) => (
+          {locadores.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={6} className="h-24 text-center">
+                <div className="flex flex-col items-center gap-2">
+                  <Building2 className="h-8 w-8 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">
+                    Nenhum locador cadastrado
+                  </p>
+                </div>
+              </TableCell>
+            </TableRow>
+          ) : (
+            locadores.map((locador) => (
             <TableRow key={locador.id}>
               <TableCell className="font-medium">
                 {locador.tipo_pessoa === 'juridica'
@@ -137,20 +169,22 @@ export function LocadoresTable() {
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" aria-label="Editar locador">
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => handleDelete(locador.id)}
+                    aria-label="Excluir locador"
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
                 </div>
               </TableCell>
             </TableRow>
-          ))}
+            ))
+          )}
         </TableBody>
       </Table>
     </div>

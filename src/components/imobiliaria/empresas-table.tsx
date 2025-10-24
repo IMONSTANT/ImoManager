@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Edit, Trash2, Mail, Phone, Building2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
@@ -67,13 +68,32 @@ export function EmpresasTable() {
   }
 
   if (loading) {
-    return <div className="text-center py-8">Carregando...</div>
-  }
-
-  if (empresas.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
-        Nenhuma empresa cadastrada
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Razão Social</TableHead>
+              <TableHead>Nome Fantasia</TableHead>
+              <TableHead>CNPJ</TableHead>
+              <TableHead>Contato</TableHead>
+              <TableHead>Imóvel</TableHead>
+              <TableHead className="text-right">Ações</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {[...Array(5)].map((_, i) => (
+              <TableRow key={i}>
+                <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                <TableCell><Skeleton className="h-6 w-28" /></TableCell>
+                <TableCell><Skeleton className="h-8 w-32" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                <TableCell><Skeleton className="h-8 w-20" /></TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
     )
   }
@@ -92,7 +112,19 @@ export function EmpresasTable() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {empresas.map((empresa) => (
+          {empresas.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={6} className="h-24 text-center">
+                <div className="flex flex-col items-center gap-2">
+                  <Building2 className="h-8 w-8 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">
+                    Nenhuma empresa cadastrada
+                  </p>
+                </div>
+              </TableCell>
+            </TableRow>
+          ) : (
+            empresas.map((empresa) => (
             <TableRow key={empresa.id}>
               <TableCell className="font-medium">
                 {empresa.razao_social || empresa.descricao}
@@ -143,7 +175,7 @@ export function EmpresasTable() {
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
                   <Button variant="ghost" size="sm" asChild>
-                    <Link href={`/dashboard/imobiliaria/empresas/${empresa.id}/editar`}>
+                    <Link href={`/dashboard/imobiliaria/empresas/${empresa.id}/editar`} aria-label="Editar empresa">
                       <Edit className="h-4 w-4" />
                     </Link>
                   </Button>
@@ -151,13 +183,15 @@ export function EmpresasTable() {
                     variant="ghost"
                     size="sm"
                     onClick={() => handleDelete(empresa.id)}
+                    aria-label="Excluir empresa"
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
                 </div>
               </TableCell>
             </TableRow>
-          ))}
+            ))
+          )}
         </TableBody>
       </Table>
     </div>
