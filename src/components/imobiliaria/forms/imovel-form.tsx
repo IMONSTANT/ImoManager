@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { imovelSchema, type ImovelFormData } from '@/lib/validations/imobiliaria'
-import { useCreateImovel, useUpdateImovel, useTiposImovel, useLocadores } from '@/hooks/useImobiliaria'
+import { useCreateImovel, useUpdateImovel, useTiposImovel, useLocadores, useEnderecos } from '@/hooks/useImobiliaria'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -12,6 +12,8 @@ import { Form, FormField, FormItem, FormLabel, FormMessage, FormControl, FormDes
 import { Loader2, Save, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
+import { EnderecoFormDialog } from './endereco-form-dialog'
+import { useQueryClient } from '@tanstack/react-query'
 
 interface ImovelFormProps {
   initialData?: ImovelFormData
@@ -21,14 +23,17 @@ interface ImovelFormProps {
 
 export function ImovelForm({ initialData, imovelId, onSuccess }: ImovelFormProps) {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const { data: tiposImovel } = useTiposImovel()
   const { data: locadores } = useLocadores()
+  const { data: enderecos } = useEnderecos()
   const createMutation = useCreateImovel()
   const updateMutation = useUpdateImovel()
 
   const form = useForm<ImovelFormData>({
     resolver: zodResolver(imovelSchema) as any,
     defaultValues: initialData || {
+      endereco_id: undefined,
       tipo_imovel_id: undefined,
       locador_id: undefined,
       codigo_imovel: '',
@@ -42,6 +47,16 @@ export function ImovelForm({ initialData, imovelId, onSuccess }: ImovelFormProps
       disponivel: true
     }
   })
+
+  const handleEnderecoCreated = async (enderecoId: number) => {
+    // Invalida e recarrega a lista de endereços
+    await queryClient.invalidateQueries({ queryKey: ['enderecos'] })
+
+    // Seleciona automaticamente o endereço recém-criado
+    form.setValue('endereco_id', enderecoId)
+
+    toast.success('Endereço selecionado automaticamente!')
+  }
 
   const onSubmit = async (data: ImovelFormData) => {
     try {
@@ -64,10 +79,57 @@ export function ImovelForm({ initialData, imovelId, onSuccess }: ImovelFormProps
         <Card>
           <CardHeader>
             <CardTitle>Informações Básicas</CardTitle>
-            <CardDescription>Dados principais do imóvel</CardDescription>
+            <CardDescription>
+              Dados principais do imóvel. A empresa cadastra o imóvel e vincula ao proprietário (locador).
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-3">
+            <div className="rounded-lg bg-blue-50 dark:bg-blue-950 p-4 border border-blue-200 dark:border-blue-800">
+              <p className="text-sm text-blue-800 dark:text-blue-200">
+                <strong>Fluxo de Cadastro:</strong> A empresa/imobiliária cadastra os imóveis no sistema e vincula ao locador (proprietário).
+                Os locadores não cadastram seus próprios imóveis - isso é feito pela equipe da imobiliária.
+              </p>
+            </div>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+              <FormField
+                control={form.control}
+                name="endereco_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>
+                        Endereço <span className="text-destructive">*</span>
+                      </FormLabel>
+                      <EnderecoFormDialog onSuccess={handleEnderecoCreated} />
+                    </div>
+                    <Select
+                      value={field.value?.toString() || ''}
+                      onValueChange={(value) => field.onChange(parseInt(value))}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o endereço" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {!enderecos || enderecos.length === 0 ? (
+                          <SelectItem value="none" disabled>
+                            Nenhum endereço cadastrado
+                          </SelectItem>
+                        ) : (
+                          enderecos.map((endereco) => (
+                            <SelectItem key={endereco.id} value={endereco.id.toString()}>
+                              {endereco.logradouro}, {endereco.numero} - {endereco.bairro}, {endereco.cidade}/{endereco.uf}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="tipo_imovel_id"

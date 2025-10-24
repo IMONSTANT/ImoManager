@@ -51,7 +51,7 @@ export function ImovelSelector({ onSelect, selectedId }: ImovelSelectorProps) {
         `)
         .eq('disponivel', true)
         .is('deleted_at', null)
-        .order('criado_em', { ascending: false });
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       return data;

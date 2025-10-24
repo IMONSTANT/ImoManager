@@ -29,7 +29,7 @@ export default async function UsersPage() {
             Manage your system users and their permissions.
           </p>
         </div>
-        <UsersTable data={users || []} />
+        <UsersTable data={(users || []) as any} />
       </div>
     </div>
   )

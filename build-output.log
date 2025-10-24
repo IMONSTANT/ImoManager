@@ -1,0 +1,37 @@
+
+> user-management-system@0.1.0 build
+> next build
+
+ ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /home/jonker/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /home/jonker/Documents/beeing-rich-poc/user-management-system/package-lock.json
+
+   ▲ Next.js 16.0.0 (Turbopack)
+   - Environments: .env.local
+   - Experiments (use with caution):
+     · optimizePackageImports
+
+ ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 5.8s
+   Running TypeScript ...
+Failed to compile.
+
+./src/hooks/use-documentos.ts:60:15
+Type error: No overload matches this call.
+  Overload 1 of 2, '(relation: "profiles" | "organizations" | "parcela" | "fiador" | "imovel" | "locatario" | "tipo_locacao" | "endereco" | "pessoa" | "contrato_locacao" | "locador" | "tipo_imovel" | "profissao" | ... 8 more ... | "solutions"): PostgrestQueryBuilder<...>', gave the following error.
+    Argument of type '"documento_instancia"' is not assignable to parameter of type '"profiles" | "organizations" | "parcela" | "fiador" | "imovel" | "locatario" | "tipo_locacao" | "endereco" | "pessoa" | "contrato_locacao" | "locador" | "tipo_imovel" | "profissao" | ... 8 more ... | "solutions"'.
+  Overload 2 of 2, '(relation: "view_imoveis_completos" | "view_contratos_ativos" | "view_contratos_vencendo"): PostgrestQueryBuilder<{ PostgrestVersion: "12"; }, { Tables: { analytics_events: { Row: { created_at: string | null; ... 4 more ...; user_id: string | null; }; Insert: { ...; }; Update: { ...; }; Relationships: [...]; }; ... 20 more ...; tipo_locacao: { ...; }; }; Views: { ...; }; Functions: { ...; }; Enums: { ...; }; CompositeTypes: {}; }, { ...; } | ... 1 more ... | { ...; }, "view_imoveis_completos" | ... 1 more ... | "view_contratos_vencendo", []>', gave the following error.
+    Argument of type '"documento_instancia"' is not assignable to parameter of type '"view_imoveis_completos" | "view_contratos_ativos" | "view_contratos_vencendo"'.
+
+[0m [90m 58 |[39m       [36mconst[39m supabase [33m=[39m createClient()
+ [90m 59 |[39m       [36mlet[39m query [33m=[39m supabase
+[31m[1m>[22m[39m[90m 60 |[39m         [33m.[39m[36mfrom[39m([32m'documento_instancia'[39m)
+ [90m    |[39m               [31m[1m^[22m[39m
+ [90m 61 |[39m         [33m.[39mselect([32m`[39m
+ [90m 62 |[39m [32m          *,[39m
+ [90m 63 |[39m [32m          modelo:modelo_id(id, tipo, nome),[39m[0m
+Next.js build worker exited with code: 1 and signal: null

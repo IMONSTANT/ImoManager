@@ -55,8 +55,8 @@ export const pessoaSchema = z.object({
       message: 'CPF inválido'
     }),
   rg: z.string().max(20, 'RG muito longo').optional(),
-  profissao_id: z.number().int().positive().optional(),
-  endereco_id: z.number().int().positive().optional(),
+  profissao_id: z.coerce.number().int().positive().optional(),
+  endereco_id: z.coerce.number().int().positive().optional(),
   email: z.string()
     .optional()
     .refine((val) => !val || validateEmail(val), {
@@ -76,7 +76,7 @@ export type PessoaFormData = z.infer<typeof pessoaSchema>
 // LOCADOR Schema
 // ============================================================================
 export const locadorSchema = z.object({
-  pessoa_id: z.number().int().positive('Selecione uma pessoa'),
+  pessoa_id: z.coerce.number().int().positive('Selecione uma pessoa'),
   tipo_pessoa: z.enum(['fisica', 'juridica'], 'Selecione o tipo de pessoa'),
   cnpj: z.string()
     .optional()
@@ -100,9 +100,9 @@ export type LocadorFormData = z.infer<typeof locadorSchema>
 // LOCATARIO Schema
 // ============================================================================
 export const locatarioSchema = z.object({
-  pessoa_id: z.number().int().positive('Selecione uma pessoa'),
+  pessoa_id: z.coerce.number().int().positive('Selecione uma pessoa'),
   referencias: z.string().optional(),
-  renda_mensal: z.number().nonnegative('Renda deve ser positiva').optional()
+  renda_mensal: z.coerce.number().nonnegative('Renda deve ser positiva').optional()
 })
 
 export type LocatarioFormData = z.infer<typeof locatarioSchema>
@@ -111,8 +111,8 @@ export type LocatarioFormData = z.infer<typeof locatarioSchema>
 // FIADOR Schema
 // ============================================================================
 export const fiadorSchema = z.object({
-  pessoa_id: z.number().int().positive('Selecione uma pessoa'),
-  patrimonio_estimado: z.number().nonnegative('Patrimônio deve ser positivo').optional(),
+  pessoa_id: z.coerce.number().int().positive('Selecione uma pessoa'),
+  patrimonio_estimado: z.coerce.number().nonnegative('Patrimônio deve ser positivo').optional(),
   observacoes: z.string().optional()
 })
 
@@ -122,19 +122,19 @@ export type FiadorFormData = z.infer<typeof fiadorSchema>
 // IMOVEL Schema
 // ============================================================================
 export const imovelSchema = z.object({
-  endereco_id: z.number().int().positive('Selecione um endereço'),
-  locador_id: z.number().int().positive('Selecione um locador'),
-  tipo_imovel_id: z.number().int().positive('Selecione o tipo de imóvel'),
+  endereco_id: z.coerce.number().int().positive('Selecione um endereço'),
+  locador_id: z.coerce.number().int().positive('Selecione um locador'),
+  tipo_imovel_id: z.coerce.number().int().positive('Selecione o tipo de imóvel'),
   codigo_imovel: z.string().max(50, 'Código muito longo').optional(),
   descricao: z.string().optional(),
-  area_total: z.number().positive('Área total deve ser positiva').optional(),
-  area_construida: z.number().positive('Área construída deve ser positiva').optional(),
-  quartos: z.number().int().nonnegative('Quartos deve ser positivo').optional(),
-  banheiros: z.number().int().nonnegative('Banheiros deve ser positivo').optional(),
-  vagas_garagem: z.number().int().nonnegative('Vagas deve ser positivo').optional(),
-  valor_aluguel: z.number().positive('Valor do aluguel é obrigatório'),
-  valor_condominio: z.number().nonnegative('Valor do condomínio deve ser positivo').optional(),
-  iptu: z.number().nonnegative('IPTU deve ser positivo').optional(),
+  area_total: z.coerce.number().positive('Área total deve ser positiva').optional(),
+  area_construida: z.coerce.number().positive('Área construída deve ser positiva').optional(),
+  quartos: z.coerce.number().int().nonnegative('Quartos deve ser positivo').optional(),
+  banheiros: z.coerce.number().int().nonnegative('Banheiros deve ser positivo').optional(),
+  vagas_garagem: z.coerce.number().int().nonnegative('Vagas deve ser positivo').optional(),
+  valor_aluguel: z.coerce.number().positive('Valor do aluguel é obrigatório'),
+  valor_condominio: z.coerce.number().nonnegative('Valor do condomínio deve ser positivo').optional(),
+  iptu: z.coerce.number().nonnegative('IPTU deve ser positivo').optional(),
   disponivel: z.boolean().default(true),
   data_disponibilidade: z.string().optional(),
   observacoes: z.string().optional()
@@ -166,8 +166,8 @@ export const empresaClienteSchema = z.object({
     }),
   inscricao_estadual: z.string().max(30, 'Inscrição estadual muito longa').optional(),
   inscricao_municipal: z.string().max(30, 'Inscrição municipal muito longa').optional(),
-  endereco_id: z.number().int().positive('Selecione um endereço'),
-  imovel_id: z.number().int().positive().optional(),
+  endereco_id: z.coerce.number().int().positive('Selecione um endereço'),
+  imovel_id: z.coerce.number().int().positive().optional(),
   email: z.string()
     .optional()
     .refine((val) => !val || validateEmail(val), {
@@ -188,24 +188,24 @@ export type EmpresaClienteFormData = z.infer<typeof empresaClienteSchema>
 // CONTRATO LOCACAO Schema
 // ============================================================================
 export const contratoLocacaoSchema = z.object({
-  imovel_id: z.number().int().positive('Selecione um imóvel'),
-  locatario_id: z.number().int().positive('Selecione um locatário'),
-  fiador_id: z.number().int().positive().optional(),
-  tipo_locacao_id: z.number().int().positive('Selecione o tipo de locação'),
-  valor: z.number().positive('Valor do aluguel é obrigatório'),
-  caucao: z.number().nonnegative('Caução deve ser positiva').optional(),
-  valor_iptu: z.number().nonnegative('Valor do IPTU deve ser positivo').optional(),
-  valor_condominio: z.number().nonnegative('Valor do condomínio deve ser positivo').optional(),
+  imovel_id: z.coerce.number().int().positive('Selecione um imóvel'),
+  locatario_id: z.coerce.number().int().positive('Selecione um locatário'),
+  fiador_id: z.coerce.number().int().positive().optional(),
+  tipo_locacao_id: z.coerce.number().int().positive('Selecione o tipo de locação'),
+  valor: z.coerce.number().positive('Valor do aluguel é obrigatório'),
+  caucao: z.coerce.number().nonnegative('Caução deve ser positiva').optional(),
+  valor_iptu: z.coerce.number().nonnegative('Valor do IPTU deve ser positivo').optional(),
+  valor_condominio: z.coerce.number().nonnegative('Valor do condomínio deve ser positivo').optional(),
   data_inicio_contrato: z.string().min(1, 'Data de início é obrigatória'),
   data_fim_contrato: z.string().min(1, 'Data de fim é obrigatória'),
-  data_vencimento_aluguel: z.number()
+  data_vencimento_aluguel: z.coerce.number()
     .int()
     .min(1, 'Dia de vencimento deve ser entre 1 e 31')
     .max(31, 'Dia de vencimento deve ser entre 1 e 31')
     .default(10),
   indice_reajuste: z.string().max(20, 'Índice muito longo').default('IGPM'),
-  periodicidade_reajuste: z.number().int().positive('Periodicidade deve ser positiva').default(12),
-  dia_vencimento: z.number()
+  periodicidade_reajuste: z.coerce.number().int().positive('Periodicidade deve ser positiva').default(12),
+  dia_vencimento: z.coerce.number()
     .int()
     .min(1, 'Dia de vencimento deve ser entre 1 e 31')
     .max(31, 'Dia de vencimento deve ser entre 1 e 31')

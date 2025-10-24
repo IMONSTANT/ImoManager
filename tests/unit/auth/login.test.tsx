@@ -22,21 +22,21 @@ describe('LoginForm', () => {
   it('should validate email format', async () => {
     render(<LoginForm />)
     const emailInput = screen.getByLabelText(/email/i)
-    const submitButton = screen.getByRole('button', { name: /sign in/i })
+    const submitButton = screen.getByRole('button', { name: /entrar/i })
 
     await userEvent.type(emailInput, 'invalid-email')
     await userEvent.click(submitButton)
 
-    expect(await screen.findByText(/invalid email/i)).toBeInTheDocument()
+    expect(await screen.findByText(/email.*inválido|invalid email/i)).toBeInTheDocument()
   })
 
   it('should require password', async () => {
     render(<LoginForm />)
-    const submitButton = screen.getByRole('button', { name: /sign in/i })
+    const submitButton = screen.getByRole('button', { name: /entrar/i })
 
     await userEvent.click(submitButton)
 
-    expect(await screen.findByText(/password.*required/i)).toBeInTheDocument()
+    expect(await screen.findByText(/senha.*obrigatória|password.*required/i)).toBeInTheDocument()
   })
 
   it('should call onSuccess after successful login', async () => {
@@ -44,8 +44,8 @@ describe('LoginForm', () => {
     render(<LoginForm onSuccess={onSuccess} />)
 
     await userEvent.type(screen.getByLabelText(/email/i), 'test@example.com')
-    await userEvent.type(screen.getByLabelText(/password/i), 'password123')
-    await userEvent.click(screen.getByRole('button', { name: /sign in/i }))
+    await userEvent.type(screen.getByLabelText(/senha|password/i), 'password123')
+    await userEvent.click(screen.getByRole('button', { name: /entrar/i }))
 
     await waitFor(() => expect(onSuccess).toHaveBeenCalled())
   })

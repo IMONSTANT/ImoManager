@@ -16,7 +16,7 @@ export default function LocatariosPage() {
             Gerencie todos os locatários (inquilinos)
           </p>
         </div>
-        <Link href="/dashboard/imobiliaria/pessoas/novo">
+        <Link href="/dashboard/imobiliaria/locatarios/novo">
           <Button>
             <Plus className="mr-2 h-4 w-4" />
             Novo Locatário

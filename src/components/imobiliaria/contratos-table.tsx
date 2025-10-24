@@ -1,6 +1,5 @@
 "use client"
 
-import { useEffect, useState } from 'react'
 import {
   Table,
   TableBody,
@@ -11,74 +10,28 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Edit, Trash2, FileText, Calendar, DollarSign } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
+import { Edit, Trash2, FileText, Calendar, DollarSign, Loader2 } from 'lucide-react'
+import { useContratos, useDeleteContrato } from '@/hooks/useImobiliaria'
 import { toast } from 'sonner'
 import { StatusContrato } from '@/types/imobiliaria'
 import Link from 'next/link'
+import { formatCurrency } from '@/lib/utils/formatters'
 
 export function ContratosTable() {
-  const [contratos, setContratos] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const supabase = createClient()
-
-  useEffect(() => {
-    fetchContratos()
-  }, [])
-
-  async function fetchContratos() {
-    try {
-      const { data, error } = await supabase
-        .from('contrato_locacao')
-        .select(`
-          *,
-          imovel:imovel(
-            *,
-            endereco:endereco(*)
-          ),
-          locatario:locatario(
-            *,
-            pessoa:pessoa(*)
-          ),
-          tipo_locacao:tipo_locacao(descricao)
-        `)
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-
-      setContratos(data || [])
-    } catch (error) {
-      console.error('Erro ao carregar contratos:', error)
-      toast.error('Erro ao carregar contratos')
-    } finally {
-      setLoading(false)
-    }
-  }
+  // Usa React Query para buscar dados (com cache automático!)
+  const { data, isLoading, isError, error } = useContratos()
+  const deleteMutation = useDeleteContrato()
 
   async function handleDelete(id: number) {
     if (!confirm('Tem certeza que deseja excluir este contrato?')) return
 
     try {
-      const { error } = await supabase
-        .from('contrato_locacao')
-        .delete()
-        .eq('id', id)
-
-      if (error) throw error
-
+      await deleteMutation.mutateAsync(id)
       toast.success('Contrato excluído com sucesso')
-      fetchContratos()
-    } catch (error) {
-      console.error('Erro ao excluir contrato:', error)
-      toast.error('Erro ao excluir contrato')
+      // React Query invalida o cache automaticamente!
+    } catch (error: any) {
+      toast.error(error.message || 'Erro ao excluir contrato')
     }
-  }
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(value)
   }
 
   const getStatusColor = (status: StatusContrato) => {
@@ -103,9 +56,23 @@ export function ContratosTable() {
     return labels[status] || status
   }
 
-  if (loading) {
-    return <div className="text-center py-8">Carregando...</div>
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    )
   }
+
+  if (isError) {
+    return (
+      <div className="text-center py-8 text-destructive">
+        Erro ao carregar contratos: {error?.message}
+      </div>
+    )
+  }
+
+  const contratos = data?.data || []
 
   if (contratos.length === 0) {
     return (
@@ -130,7 +97,7 @@ export function ContratosTable() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {contratos.map((contrato) => (
+          {contratos.map((contrato: any) => (
             <TableRow key={contrato.id}>
               <TableCell className="font-medium">
                 {contrato.numero_contrato ? (
@@ -188,8 +155,13 @@ export function ContratosTable() {
                     variant="ghost"
                     size="sm"
                     onClick={() => handleDelete(contrato.id)}
+                    disabled={deleteMutation.isPending}
                   >
-                    <Trash2 className="h-4 w-4 text-destructive" />
+                    {deleteMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    )}
                   </Button>
                 </div>
               </TableCell>

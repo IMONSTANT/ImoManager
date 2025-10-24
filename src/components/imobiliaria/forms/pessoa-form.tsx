@@ -29,7 +29,7 @@ export function PessoaForm({ initialData, pessoaId, onSuccess, onCancel }: Pesso
   const updateMutation = useUpdatePessoa()
 
   const form = useForm<PessoaFormData>({
-    resolver: zodResolver(pessoaSchema),
+    resolver: zodResolver(pessoaSchema) as any,
     defaultValues: initialData || {
       nome: '',
       data_nascimento: '',

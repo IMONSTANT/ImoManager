@@ -27,8 +27,8 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
-import { Loader2, Save, X, Plus, MapPin } from 'lucide-react'
-import Link from 'next/link'
+import { Loader2, Save, X, MapPin } from 'lucide-react'
+import { EnderecoFormDialog } from './endereco-form-dialog'
 
 const empresaSchema = z.object({
   descricao: z.string().min(1, 'Informe a descrição/nome da empresa'),
@@ -111,6 +111,16 @@ export function EmpresaForm({ initialData, empresaId, onSuccess }: EmpresaFormPr
     } catch (error) {
       console.error('Erro ao carregar endereços:', error)
     }
+  }
+
+  const handleEnderecoCreated = async (enderecoId: number) => {
+    // Recarrega a lista de endereços
+    await fetchEnderecos()
+
+    // Seleciona automaticamente o endereço recém-criado
+    form.setValue('endereco_id', enderecoId.toString())
+
+    toast.success('Endereço selecionado automaticamente!')
   }
 
   async function onSubmit(data: EmpresaFormValues) {
@@ -341,12 +351,7 @@ export function EmpresaForm({ initialData, empresaId, onSuccess }: EmpresaFormPr
                 <CardTitle>Endereço</CardTitle>
                 <CardDescription>Selecione o endereço da empresa</CardDescription>
               </div>
-              <Link href="/dashboard/imobiliaria/enderecos/novo" target="_blank">
-                <Button type="button" variant="outline" size="sm">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Novo Endereço
-                </Button>
-              </Link>
+              <EnderecoFormDialog onSuccess={handleEnderecoCreated} />
             </div>
           </CardHeader>
           <CardContent>

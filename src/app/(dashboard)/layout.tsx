@@ -16,16 +16,16 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      {/* Sidebar Desktop */}
-      <aside className="hidden md:flex w-64 flex-col fixed inset-y-0 z-50 border-r bg-background backdrop-blur-none">
+    <div className="flex h-screen overflow-hidden bg-background">
+      {/* Sidebar Desktop - FULLY OPAQUE */}
+      <aside className="hidden md:flex w-64 flex-col fixed inset-y-0 z-50 border-r bg-background shadow-sm opacity-100">
         <Sidebar userEmail={user.email} />
       </aside>
 
       {/* Sidebar Mobile com overlay e botão */}
       <MobileSidebar userEmail={user.email} />
 
-      <main className="flex-1 md:pl-64 overflow-y-auto pt-16 md:pt-0">
+      <main className="flex-1 md:pl-64 overflow-y-auto pt-16 md:pt-0 bg-background">
         {children}
       </main>
     </div>

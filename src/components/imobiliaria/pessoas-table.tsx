@@ -1,6 +1,5 @@
 "use client"
 
-import { useEffect, useState } from 'react'
 import {
   Table,
   TableBody,
@@ -11,65 +10,46 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Edit, Trash2, Mail, Phone } from 'lucide-react'
+import { Edit, Trash2, Mail, Phone, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { PessoaCompleta } from '@/types/imobiliaria'
-import { createClient } from '@/lib/supabase/client'
+import { usePessoas, useDeletePessoa } from '@/hooks/useImobiliaria'
 import { toast } from 'sonner'
+import { maskCPF, maskPhone } from '@/lib/utils/formatters'
 
 export function PessoasTable() {
-  const [pessoas, setPessoas] = useState<PessoaCompleta[]>([])
-  const [loading, setLoading] = useState(true)
-  const supabase = createClient()
-
-  useEffect(() => {
-    fetchPessoas()
-  }, [])
-
-  async function fetchPessoas() {
-    try {
-      const { data, error } = await supabase
-        .from('pessoa')
-        .select(`
-          *,
-          profissao:profissao(descricao),
-          endereco:endereco(*)
-        `)
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-
-      setPessoas(data || [])
-    } catch (error) {
-      console.error('Erro ao carregar pessoas:', error)
-      toast.error('Erro ao carregar pessoas')
-    } finally {
-      setLoading(false)
-    }
-  }
+  // Usa React Query para buscar dados (com cache automático!)
+  const { data, isLoading, isError, error } = usePessoas()
+  const deleteMutation = useDeletePessoa()
 
   async function handleDelete(id: number) {
     if (!confirm('Tem certeza que deseja excluir esta pessoa?')) return
 
     try {
-      const { error } = await supabase
-        .from('pessoa')
-        .delete()
-        .eq('id', id)
-
-      if (error) throw error
-
+      await deleteMutation.mutateAsync(id)
       toast.success('Pessoa excluída com sucesso')
-      fetchPessoas()
-    } catch (error) {
-      console.error('Erro ao excluir pessoa:', error)
-      toast.error('Erro ao excluir pessoa')
+      // React Query invalida o cache automaticamente!
+    } catch (error: any) {
+      toast.error(error.message || 'Erro ao excluir pessoa')
     }
   }
 
-  if (loading) {
-    return <div className="text-center py-8">Carregando...</div>
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    )
   }
+
+  if (isError) {
+    return (
+      <div className="text-center py-8 text-destructive">
+        Erro ao carregar pessoas: {error?.message}
+      </div>
+    )
+  }
+
+  const pessoas = data?.data || []
 
   if (pessoas.length === 0) {
     return (
@@ -98,13 +78,15 @@ export function PessoasTable() {
               <TableCell className="font-medium">{pessoa.nome}</TableCell>
               <TableCell>
                 {pessoa.cpf ? (
-                  <Badge variant="outline">{pessoa.cpf}</Badge>
+                  <Badge variant="outline">{maskCPF(pessoa.cpf)}</Badge>
                 ) : (
                   <span className="text-muted-foreground text-sm">N/A</span>
                 )}
               </TableCell>
               <TableCell>
-                {pessoa.profissao?.descricao || (
+                {(Array.isArray(pessoa.profissao)
+                  ? (pessoa.profissao[0] as any)?.descricao
+                  : (pessoa.profissao as any)?.descricao) || (
                   <span className="text-muted-foreground text-sm">N/A</span>
                 )}
               </TableCell>
@@ -113,7 +95,7 @@ export function PessoasTable() {
                   {pessoa.telefone && (
                     <div className="flex items-center gap-1 text-sm">
                       <Phone className="h-3 w-3" />
-                      {pessoa.telefone}
+                      {maskPhone(pessoa.telefone)}
                     </div>
                   )}
                   {pessoa.email && (
@@ -141,8 +123,13 @@ export function PessoasTable() {
                     variant="ghost"
                     size="sm"
                     onClick={() => handleDelete(pessoa.id)}
+                    disabled={deleteMutation.isPending}
                   >
-                    <Trash2 className="h-4 w-4 text-destructive" />
+                    {deleteMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    )}
                   </Button>
                 </div>
               </TableCell>

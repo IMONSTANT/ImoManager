@@ -13,12 +13,12 @@ import {
   UserX,
   Briefcase,
   X,
+  MapPin,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { ThemeToggle } from "@/components/theme-toggle"
 import { useSidebarStore } from "@/store/sidebar-store"
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -50,6 +50,12 @@ export function Sidebar({ className, userEmail }: SidebarProps) {
       icon: Home,
       href: "/dashboard/imobiliaria/imoveis",
       active: pathname?.startsWith("/dashboard/imobiliaria/imoveis"),
+    },
+    {
+      label: "Endereços",
+      icon: MapPin,
+      href: "/dashboard/imobiliaria/enderecos",
+      active: pathname?.startsWith("/dashboard/imobiliaria/enderecos"),
     },
     {
       label: "Contratos",
@@ -99,9 +105,9 @@ export function Sidebar({ className, userEmail }: SidebarProps) {
   ]
 
   return (
-    <div className={cn("pb-12 min-h-screen bg-background border-r shadow-sm backdrop-blur-none", className)}>
-      <div className="space-y-4 py-4">
-        <div className="px-3 py-2">
+    <div className={cn("pb-12 min-h-screen bg-background border-r shadow-sm", className)}>
+      <div className="space-y-4 py-4 bg-background">
+        <div className="px-3 py-2 bg-background">
           <div className="flex items-center justify-between mb-6 px-4">
             <div className="flex items-center gap-2.5">
               <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md">
@@ -111,18 +117,15 @@ export function Sidebar({ className, userEmail }: SidebarProps) {
                 Beeing Rich
               </h2>
             </div>
-            <div className="flex items-center gap-2">
-              <ThemeToggle />
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={close}
-                className="md:hidden h-9 w-9"
-                aria-label="Fechar menu"
-              >
-                <X className="h-5 w-5" />
-              </Button>
-            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={close}
+              className="md:hidden h-9 w-9"
+              aria-label="Fechar menu"
+            >
+              <X className="h-5 w-5" />
+            </Button>
           </div>
           <Separator className="mb-4" />
 
@@ -203,7 +206,7 @@ export function Sidebar({ className, userEmail }: SidebarProps) {
         <Separator />
 
         <div className="px-3 py-2">
-          <div className="px-3 py-3 text-sm bg-muted rounded-lg mb-3">
+          <div className="px-3 py-3 text-sm bg-muted rounded-lg mb-3 opacity-100">
             <p className="text-xs text-muted-foreground mb-1">Conectado como</p>
             <p className="font-medium truncate">{userEmail}</p>
           </div>

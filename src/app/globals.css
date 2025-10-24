@@ -2,7 +2,7 @@
 
 @theme {
   /* Professional Real Estate Color Palette - Light Mode */
-  /* Solid, opaque backgrounds - no transparency */
+  /* CRITICAL: All backgrounds MUST be 100% opaque - NO transparency */
   --color-background: 0 0% 100%;
   --color-foreground: 222 47% 11%;
   --color-card: 0 0% 100%;
@@ -11,76 +11,85 @@
   --color-popover-foreground: 222 47% 11%;
 
   /* Primary - Deep Professional Blue (Trust & Stability) */
-  --color-primary: 217 89% 61% / 1;
-  --color-primary-foreground: 0 0% 100% / 1;
+  --color-primary: 217 89% 61%;
+  --color-primary-foreground: 0 0% 100%;
 
   /* Secondary - Sophisticated Gold (Premium & Investment) */
-  --color-secondary: 45 93% 47% / 1;
-  --color-secondary-foreground: 0 0% 100% / 1;
+  --color-secondary: 45 93% 47%;
+  --color-secondary-foreground: 0 0% 100%;
 
   /* Accent - Elegant Emerald (Growth & Success) */
-  --color-accent: 210 40% 96.1% / 1;
-  --color-accent-foreground: 222 47% 11% / 1;
+  --color-accent: 210 40% 96.1%;
+  --color-accent-foreground: 222 47% 11%;
 
-  --color-muted: 210 40% 96.1% / 1;
-  --color-muted-foreground: 215.4 16.3% 46.9% / 1;
+  --color-muted: 210 40% 96.1%;
+  --color-muted-foreground: 215.4 16.3% 46.9%;
 
-  --color-destructive: 0 72% 51% / 1;
-  --color-destructive-foreground: 0 0% 100% / 1;
+  /* Placeholder colors - optimized for visibility and accessibility */
+  --color-placeholder: 215.4 16.3% 40%;
+  /* Lightness reduced from 46.9% to 40% for better visibility */
 
-  --color-border: 214.3 31.8% 91.4% / 1;
-  --color-input: 214.3 31.8% 91.4% / 1;
-  --color-ring: 217 89% 61% / 1;
+  --color-destructive: 0 72% 51%;
+  --color-destructive-foreground: 0 0% 100%;
+
+  --color-border: 214.3 31.8% 91.4%;
+  --color-input: 214.3 31.8% 91.4%;
+  --color-ring: 217 89% 61%;
   --radius: 0.5rem;
 
   /* Custom Real Estate Theme Colors */
-  --color-success: 142 71% 45% / 1;
-  --color-success-foreground: 0 0% 100% / 1;
-  --color-warning: 38 92% 50% / 1;
-  --color-warning-foreground: 0 0% 100% / 1;
-  --color-info: 199 89% 48% / 1;
-  --color-info-foreground: 0 0% 100% / 1;
+  --color-success: 142 71% 45%;
+  --color-success-foreground: 0 0% 100%;
+  --color-warning: 38 92% 50%;
+  --color-warning-foreground: 0 0% 100%;
+  --color-info: 199 89% 48%;
+  --color-info-foreground: 0 0% 100%;
 }
 
 @media (prefers-color-scheme: dark) {
   @theme {
     /* Professional Real Estate Color Palette - Dark Mode */
-    --color-background: 222.2 84% 4.9% / 1;
-    --color-foreground: 210 40% 98% / 1;
-    --color-card: 222.2 84% 4.9% / 1;
-    --color-card-foreground: 210 40% 98% / 1;
-    --color-popover: 222.2 84% 4.9% / 1;
-    --color-popover-foreground: 210 40% 98% / 1;
+    /* CRITICAL: All backgrounds MUST be 100% opaque - NO transparency */
+    --color-background: 222.2 84% 4.9%;
+    --color-foreground: 210 40% 98%;
+    --color-card: 222.2 84% 4.9%;
+    --color-card-foreground: 210 40% 98%;
+    --color-popover: 222.2 84% 4.9%;
+    --color-popover-foreground: 210 40% 98%;
 
     /* Primary - Bright Blue for dark mode */
-    --color-primary: 217 91% 65% / 1;
-    --color-primary-foreground: 222.2 84% 4.9% / 1;
+    --color-primary: 217 91% 65%;
+    --color-primary-foreground: 222.2 84% 4.9%;
 
     /* Secondary - Vibrant Gold */
-    --color-secondary: 45 93% 47% / 1;
-    --color-secondary-foreground: 222.2 84% 4.9% / 1;
+    --color-secondary: 45 93% 47%;
+    --color-secondary-foreground: 222.2 84% 4.9%;
 
     /* Accent - Muted for dark mode */
-    --color-accent: 217.2 32.6% 17.5% / 1;
-    --color-accent-foreground: 210 40% 98% / 1;
+    --color-accent: 217.2 32.6% 17.5%;
+    --color-accent-foreground: 210 40% 98%;
 
-    --color-muted: 217.2 32.6% 17.5% / 1;
-    --color-muted-foreground: 215 20.2% 65.1% / 1;
+    --color-muted: 217.2 32.6% 17.5%;
+    --color-muted-foreground: 215 20.2% 65.1%;
 
-    --color-destructive: 0 62.8% 30.6% / 1;
-    --color-destructive-foreground: 210 40% 98% / 1;
+    /* Placeholder colors - optimized for dark mode visibility */
+    --color-placeholder: 215 20.2% 55%;
+    /* Lightness reduced from 65.1% to 55% for better distinction from filled text */
 
-    --color-border: 217.2 32.6% 17.5% / 1;
-    --color-input: 217.2 32.6% 17.5% / 1;
-    --color-ring: 217 91% 65% / 1;
+    --color-destructive: 0 62.8% 30.6%;
+    --color-destructive-foreground: 210 40% 98%;
+
+    --color-border: 217.2 32.6% 17.5%;
+    --color-input: 217.2 32.6% 17.5%;
+    --color-ring: 217 91% 65%;
 
     /* Custom Real Estate Theme Colors - Dark Mode */
-    --color-success: 142 71% 45% / 1;
-    --color-success-foreground: 0 0% 100% / 1;
-    --color-warning: 38 92% 50% / 1;
-    --color-warning-foreground: 0 0% 100% / 1;
-    --color-info: 199 89% 48% / 1;
-    --color-info-foreground: 0 0% 100% / 1;
+    --color-success: 142 71% 45%;
+    --color-success-foreground: 0 0% 100%;
+    --color-warning: 38 92% 50%;
+    --color-warning-foreground: 0 0% 100%;
+    --color-info: 199 89% 48%;
+    --color-info-foreground: 0 0% 100%;
   }
 }
 
@@ -123,19 +132,36 @@ body {
   transition-duration: 150ms;
 }
 
-/* Date input styling */
+/* Beautiful Date Input Styling */
+input[type="date"] {
+  position: relative;
+  cursor: pointer;
+  /* Use theme-aware color-scheme for native date picker */
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  input[type="date"] {
+    color-scheme: dark;
+  }
+}
+
+/* Calendar picker indicator (ícone de calendário nativo) */
 input[type="date"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
-  opacity: 0.6;
+  opacity: 0.7;
   padding: 0;
   margin-left: 0.5rem;
-  width: 1rem;
-  height: 1rem;
-  transition: opacity 200ms ease;
+  width: 1.25rem;
+  height: 1.25rem;
+  transition: opacity 200ms ease, transform 200ms ease;
+  filter: brightness(0.8);
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator:hover {
   opacity: 1;
+  transform: scale(1.1);
+  filter: brightness(1);
 }
 
 input[type="date"]::-webkit-clear-button {
@@ -143,29 +169,68 @@ input[type="date"]::-webkit-clear-button {
 }
 
 input[type="date"]::-moz-calendar-picker-indicator {
-  opacity: 0.6;
+  opacity: 0.7;
   cursor: pointer;
-  transition: opacity 200ms ease;
+  transition: opacity 200ms ease, transform 200ms ease;
 }
 
 input[type="date"]::-moz-calendar-picker-indicator:hover {
   opacity: 1;
+  transform: scale(1.1);
 }
 
+/* Estilização dos campos de data (dia, mês, ano) */
 input[type="date"]::-webkit-datetime-edit-text,
 input[type="date"]::-webkit-datetime-edit-month-field,
 input[type="date"]::-webkit-datetime-edit-day-field,
 input[type="date"]::-webkit-datetime-edit-year-field {
   color: hsl(var(--color-foreground));
-  padding: 0.125rem;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  transition: background-color 150ms ease;
+}
+
+input[type="date"]::-webkit-datetime-edit-month-field:hover,
+input[type="date"]::-webkit-datetime-edit-day-field:hover,
+input[type="date"]::-webkit-datetime-edit-year-field:hover {
+  background-color: hsl(var(--color-accent));
 }
 
 input[type="date"]::-webkit-datetime-edit {
+  color: hsl(var(--color-foreground));
+  padding: 0.125rem;
+}
+
+/* Quando não há valor selecionado */
+input[type="date"]::-webkit-datetime-edit-text {
   color: hsl(var(--color-muted-foreground));
 }
 
+/* Estado de foco */
 input[type="date"]:focus::-webkit-datetime-edit {
   color: hsl(var(--color-foreground));
+}
+
+input[type="date"]:focus::-webkit-datetime-edit-text,
+input[type="date"]:focus::-webkit-datetime-edit-month-field,
+input[type="date"]:focus::-webkit-datetime-edit-day-field,
+input[type="date"]:focus::-webkit-datetime-edit-year-field {
+  color: hsl(var(--color-foreground));
+}
+
+/* Estado com valor vazio (placeholder) */
+input[type="date"]:not(:focus)::-webkit-datetime-edit {
+  color: hsl(var(--color-muted-foreground));
+}
+
+input[type="date"]:invalid::-webkit-datetime-edit {
+  color: hsl(var(--color-muted-foreground));
+}
+
+/* Animação sutil ao abrir o picker */
+input[type="date"]:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
 
 /* Autocomplete styling */
@@ -186,6 +251,67 @@ input:-webkit-autofill:active {
     -webkit-box-shadow: 0 0 0 30px hsl(var(--color-background)) inset;
     -webkit-text-fill-color: hsl(var(--color-foreground));
   }
+}
+
+/* ============================================
+   GLOBAL PLACEHOLDER STYLES
+   Professional placeholder styling for all form elements
+   ============================================ */
+
+/* Standard placeholder styling for inputs and textareas */
+input::placeholder,
+textarea::placeholder {
+  color: hsl(var(--color-placeholder));
+  opacity: 1; /* Override browser default opacity */
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  transition: color 200ms ease, opacity 200ms ease;
+}
+
+/* Focus state - make placeholder slightly more subtle */
+input:focus::placeholder,
+textarea:focus::placeholder {
+  opacity: 0.7;
+  transition: color 200ms ease, opacity 200ms ease;
+}
+
+/* Disabled state - reduce visibility */
+input:disabled::placeholder,
+textarea:disabled::placeholder {
+  opacity: 0.5;
+  color: hsl(var(--color-placeholder) / 0.6);
+}
+
+/* Browser-specific placeholder styling for better cross-browser consistency */
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+  color: hsl(var(--color-placeholder));
+  opacity: 1;
+}
+
+input::-moz-placeholder,
+textarea::-moz-placeholder {
+  color: hsl(var(--color-placeholder));
+  opacity: 1;
+}
+
+input:-ms-input-placeholder,
+textarea:-ms-input-placeholder {
+  color: hsl(var(--color-placeholder));
+  opacity: 1;
+}
+
+input::-ms-input-placeholder,
+textarea::-ms-input-placeholder {
+  color: hsl(var(--color-placeholder));
+  opacity: 1;
+}
+
+/* Select placeholder styling (for Radix UI Select with data-placeholder attribute) */
+[data-placeholder] {
+  color: hsl(var(--color-placeholder));
+  opacity: 1;
+  font-weight: 400;
 }
 
 /* Professional focus visible states */
@@ -241,4 +367,16 @@ input:-webkit-autofill:active {
 
 .animate-slide-down {
   animation: slideDown 200ms ease-out;
+}
+
+/* Radix UI Portal fixes for Tailwind v4 */
+/* Ensure proper pointer events through portal layers */
+[data-radix-popper-content-wrapper],
+[data-radix-portal] {
+  pointer-events: none;
+}
+
+[data-radix-popper-content-wrapper] > *,
+[data-radix-portal] > * {
+  pointer-events: auto;
 }

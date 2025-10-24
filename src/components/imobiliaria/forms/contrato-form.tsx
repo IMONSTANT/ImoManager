@@ -81,9 +81,20 @@ export function ContratoForm({ initialData, contratoId, onSuccess }: ContratoFor
       observacoes: initialData.observacoes || '',
       clausulas_especiais: initialData.clausulas_especiais || '',
     } : {
+      imovel_id: '',
+      locatario_id: '',
+      tipo_locacao_id: '',
+      valor: '',
+      caucao: '',
+      valor_iptu: '',
+      valor_condominio: '',
+      data_inicio_contrato: '',
+      data_fim_contrato: '',
       dia_vencimento: '10',
       indice_reajuste: 'IGPM',
       periodicidade_reajuste: '12',
+      observacoes: '',
+      clausulas_especiais: '',
     },
   })
 

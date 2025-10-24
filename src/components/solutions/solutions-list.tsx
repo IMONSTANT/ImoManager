@@ -53,7 +53,7 @@ export function SolutionsList({ solutions, onDelete, onEdit }: Props) {
                 {solution.status}
               </Badge>
             </TableCell>
-            <TableCell>{format(new Date(solution.created_at), 'MMM dd, yyyy')}</TableCell>
+            <TableCell>{solution.created_at ? format(new Date(solution.created_at), 'MMM dd, yyyy') : 'N/A'}</TableCell>
             <TableCell className="text-right space-x-2">
               {onEdit && (
                 <Button
