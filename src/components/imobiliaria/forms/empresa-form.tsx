@@ -89,7 +89,7 @@ export function EmpresaForm({ initialData, empresaId, onSuccess }: EmpresaFormPr
         .from('imovel')
         .select('id, codigo_imovel, endereco:endereco_id(logradouro, numero)')
         .is('deleted_at', null)
-        .order('criado_em', { ascending: false })
+        .order('created_at', { ascending: false })
 
       if (error) throw error
       setImoveis(data || [])
@@ -104,7 +104,7 @@ export function EmpresaForm({ initialData, empresaId, onSuccess }: EmpresaFormPr
         .from('endereco')
         .select('*')
         .is('deleted_at', null)
-        .order('criado_em', { ascending: false })
+        .order('created_at', { ascending: false })
 
       if (error) throw error
       setEnderecos(data || [])
@@ -313,12 +313,17 @@ export function EmpresaForm({ initialData, empresaId, onSuccess }: EmpresaFormPr
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">Nenhum</SelectItem>
-                      {imoveis.map((imovel) => (
-                        <SelectItem key={imovel.id} value={imovel.id.toString()}>
-                          {imovel.codigo_imovel} - {imovel.endereco?.logradouro}, {imovel.endereco?.numero}
+                      {imoveis.length === 0 ? (
+                        <SelectItem value="none" disabled>
+                          Nenhum imóvel cadastrado
                         </SelectItem>
-                      ))}
+                      ) : (
+                        imoveis.map((imovel) => (
+                          <SelectItem key={imovel.id} value={imovel.id.toString()}>
+                            {imovel.codigo_imovel} - {imovel.endereco?.logradouro}, {imovel.endereco?.numero}
+                          </SelectItem>
+                        ))
+                      )}
                     </SelectContent>
                   </Select>
                   <FormMessage />
