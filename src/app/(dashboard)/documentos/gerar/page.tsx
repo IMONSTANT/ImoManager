@@ -128,9 +128,9 @@ export default function GerarDocumentoPage() {
 
   // Seleções do usuário
   const [tipoSelecionado, setTipoSelecionado] = useState<DocumentoTipo | ''>('')
-  const [contratoId, setContratoId] = useState('')
-  const [fiadorId, setFiadorId] = useState('')
-  const [parcelaId, setParcelaId] = useState('')
+  const [contratoId, setContratoId] = useState('none')
+  const [fiadorId, setFiadorId] = useState('none')
+  const [parcelaId, setParcelaId] = useState('none')
 
   // Documento gerado
   const [documentoGerado, setDocumentoGerado] = useState<any>(null)
@@ -141,7 +141,7 @@ export default function GerarDocumentoPage() {
   }, [])
 
   useEffect(() => {
-    if (step === 2 && contratoId) {
+    if (step === 2 && contratoId && contratoId !== 'none') {
       carregarParcelasDoContrato()
     }
   }, [contratoId, step])
@@ -197,7 +197,7 @@ export default function GerarDocumentoPage() {
   }
 
   async function carregarParcelasDoContrato() {
-    if (!contratoId) return
+    if (!contratoId || contratoId === 'none') return
 
     try {
       const { data, error } = await supabase
@@ -224,9 +224,9 @@ export default function GerarDocumentoPage() {
         tipo: tipoSelecionado,
       }
 
-      if (contratoId) payload.contrato_id = parseInt(contratoId)
-      if (fiadorId) payload.fiador_id = parseInt(fiadorId)
-      if (parcelaId) payload.parcela_id = parseInt(parcelaId)
+      if (contratoId && contratoId !== 'none') payload.contrato_id = parseInt(contratoId)
+      if (fiadorId && fiadorId !== 'none') payload.fiador_id = parseInt(fiadorId)
+      if (parcelaId && parcelaId !== 'none') payload.parcela_id = parseInt(parcelaId)
 
       const response = await fetch('/api/documentos/gerar', {
         method: 'POST',
@@ -469,7 +469,7 @@ export default function GerarDocumentoPage() {
                     </Select>
                   </div>
 
-                  {contratoId && (
+                  {contratoId && contratoId !== 'none' && (
                     <div>
                       <label className="block text-sm font-medium mb-2">
                         Selecione a Parcela <span className="text-red-500">*</span>
@@ -506,7 +506,7 @@ export default function GerarDocumentoPage() {
                         <SelectValue placeholder="Escolha um contrato" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Nenhum contrato</SelectItem>
+                        <SelectItem value="none">Nenhum contrato</SelectItem>
                         {contratos.map((contrato) => (
                           <SelectItem key={contrato.id} value={String(contrato.id)}>
                             {contrato.numero_contrato} - R$ {contrato.valor.toFixed(2)}
@@ -587,9 +587,9 @@ export default function GerarDocumentoPage() {
                   onClick={() => {
                     setStep(1)
                     setTipoSelecionado('')
-                    setContratoId('')
-                    setFiadorId('')
-                    setParcelaId('')
+                    setContratoId('none')
+                    setFiadorId('none')
+                    setParcelaId('none')
                     setDocumentoGerado(null)
                     setPreviewHTML('')
                   }}
