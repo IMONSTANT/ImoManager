@@ -73,7 +73,7 @@ export default function DocumentosPage() {
             valor
           ),
           locatario(
-            pessoa(
+            pessoa_view:pessoa_id(
               nome,
               cpf_cnpj,
               email

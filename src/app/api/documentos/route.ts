@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
           valor
         ),
         locatario:locatario_id (
-          pessoa:pessoa_id (
+          pessoa_view:pessoa_id (
             nome,
             cpf_cnpj
           )
