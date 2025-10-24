@@ -105,6 +105,13 @@ export async function POST(request: NextRequest) {
     dados_documento.data_emissao = new Date().toISOString().split('T')[0];
     dados_documento.data_geracao = new Date().toISOString().split('T')[0];
 
+    console.log('Dados coletados para geração:', {
+      tipo,
+      dados_documento,
+      modelo_id: modelo.id,
+      variaveis_esperadas: modelo.variaveis_esperadas
+    });
+
     // Gera o documento usando o service
     const input: GerarDocumentoInput = {
       modelo_id: modelo.id,
@@ -215,11 +222,17 @@ async function buscarDadosDocumento({
           ),
           locatarios:locatario (
             *,
-            pessoa:pessoa_id (*)
+            pessoa:pessoa_id (
+              *,
+              profissao:profissao_id (nome)
+            )
           ),
           fiadores:fiador (
             *,
-            pessoa:pessoa_id (*)
+            pessoa:pessoa_id (
+              *,
+              profissao:profissao_id (nome)
+            )
           )
         `)
         .eq('id', contrato_id)
@@ -249,12 +262,12 @@ async function buscarDadosDocumento({
           dados.locatarios = contrato.locatarios.map((loc: any) => ({
             nome: loc.pessoa.nome,
             cpf: loc.pessoa.cpf_cnpj,
-            rg: loc.pessoa.rg || '',
-            email: loc.pessoa.email,
-            telefone: loc.pessoa.telefone,
-            nacionalidade: loc.pessoa.nacionalidade || 'Brasileiro(a)',
-            estado_civil: loc.pessoa.estado_civil || '',
-            profissao: loc.pessoa.profissao || ''
+            rg: loc.pessoa.rg || 'Não informado',
+            email: loc.pessoa.email || '',
+            telefone: loc.pessoa.telefone || '',
+            nacionalidade: 'brasileiro(a)',
+            estado_civil: 'não informado',
+            profissao: loc.pessoa.profissao?.nome || 'Não informada'
           }));
 
           // Se só tem um locatário, também disponibiliza como objeto único
@@ -268,12 +281,12 @@ async function buscarDadosDocumento({
           dados.fiador = {
             nome: fiadorData.pessoa.nome,
             cpf: fiadorData.pessoa.cpf_cnpj,
-            rg: fiadorData.pessoa.rg || '',
-            email: fiadorData.pessoa.email,
-            telefone: fiadorData.pessoa.telefone,
-            nacionalidade: fiadorData.pessoa.nacionalidade || 'Brasileiro(a)',
-            estado_civil: fiadorData.pessoa.estado_civil || '',
-            profissao: fiadorData.pessoa.profissao || ''
+            rg: fiadorData.pessoa.rg || 'Não informado',
+            email: fiadorData.pessoa.email || '',
+            telefone: fiadorData.pessoa.telefone || '',
+            nacionalidade: 'brasileiro(a)',
+            estado_civil: 'não informado',
+            profissao: fiadorData.pessoa.profissao?.nome || 'Não informada'
           };
         }
       }
@@ -283,7 +296,7 @@ async function buscarDadosDocumento({
     if (locatario_id && !dados.locatario) {
       const { data: locatario } = await supabase
         .from('locatario')
-        .select('*, pessoa:pessoa_id (*)')
+        .select('*, pessoa:pessoa_id (*, profissao:profissao_id (nome))')
         .eq('id', locatario_id)
         .single();
 
@@ -291,12 +304,12 @@ async function buscarDadosDocumento({
         dados.locatario = {
           nome: locatario.pessoa.nome,
           cpf: locatario.pessoa.cpf_cnpj,
-          rg: locatario.pessoa.rg || '',
-          email: locatario.pessoa.email,
-          telefone: locatario.pessoa.telefone,
-          nacionalidade: locatario.pessoa.nacionalidade || 'Brasileiro(a)',
-          estado_civil: locatario.pessoa.estado_civil || '',
-          profissao: locatario.pessoa.profissao || '',
+          rg: locatario.pessoa.rg || 'Não informado',
+          email: locatario.pessoa.email || '',
+          telefone: locatario.pessoa.telefone || '',
+          nacionalidade: 'brasileiro(a)',
+          estado_civil: 'não informado',
+          profissao: locatario.pessoa.profissao?.nome || 'Não informada',
           renda_mensal: parseFloat(locatario.renda_mensal || '0')
         };
       }
@@ -306,7 +319,7 @@ async function buscarDadosDocumento({
     if (fiador_id && !dados.fiador) {
       const { data: fiador } = await supabase
         .from('fiador')
-        .select('*, pessoa:pessoa_id (*)')
+        .select('*, pessoa:pessoa_id (*, profissao:profissao_id (nome))')
         .eq('id', fiador_id)
         .single();
 
@@ -314,12 +327,12 @@ async function buscarDadosDocumento({
         dados.fiador = {
           nome: fiador.pessoa.nome,
           cpf: fiador.pessoa.cpf_cnpj,
-          rg: fiador.pessoa.rg || '',
-          email: fiador.pessoa.email,
-          telefone: fiador.pessoa.telefone,
-          nacionalidade: fiador.pessoa.nacionalidade || 'Brasileiro(a)',
-          estado_civil: fiador.pessoa.estado_civil || '',
-          profissao: fiador.pessoa.profissao || '',
+          rg: fiador.pessoa.rg || 'Não informado',
+          email: fiador.pessoa.email || '',
+          telefone: fiador.pessoa.telefone || '',
+          nacionalidade: 'brasileiro(a)',
+          estado_civil: 'não informado',
+          profissao: fiador.pessoa.profissao?.nome || 'Não informada',
           renda_mensal: parseFloat(fiador.renda_mensal || '0')
         };
       }
@@ -374,6 +387,8 @@ async function buscarDadosDocumento({
     dados.locador = {
       nome: 'Imonstant Gestão Imobiliária',
       cnpj: '12345678000190',
+      nacionalidade: 'brasileira',
+      estado_civil: 'não aplicável',
       endereco_completo: 'Rua Amadeu Furtado, 85, Sala 05, São Gerardo, Fortaleza/CE'
     };
 

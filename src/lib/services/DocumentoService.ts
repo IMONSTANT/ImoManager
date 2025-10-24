@@ -153,7 +153,13 @@ export class DocumentoService {
     const missingVars = modelo.variaveis_esperadas.filter(v => !dataKeys.includes(v))
 
     if (missingVars.length > 0) {
-      throw new Error('Dados incompletos para o template')
+      console.error('Dados incompletos para o template:', {
+        missingVars,
+        dataKeys,
+        variaveis_esperadas: modelo.variaveis_esperadas,
+        dados_documento: input.dados_documento
+      })
+      throw new Error(`Dados incompletos para o template. Faltam: ${missingVars.join(', ')}`)
     }
 
     // Interpola template
