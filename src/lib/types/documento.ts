@@ -12,7 +12,7 @@
 // =====================================================
 
 export type DocumentoTipo =
-  | 'D1'  // Ficha Cadastro Locatário
+  | 'D1'  // Declaração Entrega Contrato
   | 'D2'  // Ficha Cadastro Fiador
   | 'D3'  // Contrato Locação
   | 'D4'  // Termo Vistoria Entrada
@@ -20,7 +20,7 @@ export type DocumentoTipo =
   | 'D6'  // Autorização Débito Automático
   | 'D7'  // Termo Entrega Chaves
   | 'D8'  // Notificação Atraso
-  | 'D9'  // Notificação Rescisão
+  | 'D9'  // Acordo Rescisão
   | 'D10' // Recibo Pagamento
 
 export type DocumentoStatus =
@@ -239,19 +239,36 @@ export interface PdfOptions {
 // TIPOS PARA TEMPLATES DOS DOCUMENTOS
 // =====================================================
 
-// D1 - Ficha Cadastro Locatário
-export interface D1_FichaCadastroLocatarioData {
-  locatario: {
+// D1 - Declaração Entrega Contrato
+export interface D1_DeclaracaoEntregaContratoData {
+  locatarios: Array<{
     nome: string
     cpf: string
     rg: string
-    data_nascimento: Date
     nacionalidade: string
     estado_civil: string
     profissao: string
-    renda_mensal: number
-    email: string
-    telefone: string
+    genero_masculino?: boolean
+  }>
+  locatario?: {
+    nome: string
+    cpf: string
+    rg: string
+    nacionalidade: string
+    estado_civil: string
+    profissao: string
+  }
+  locador: {
+    nome: string
+    cpf_cnpj?: string
+  }
+  contrato: {
+    numero: string
+    valor_caucao?: number
+    data_vencimento_caucao?: Date
+    data_devolucao_assinado?: Date
+  }
+  imovel: {
     endereco: {
       logradouro: string
       numero: string
@@ -262,17 +279,7 @@ export interface D1_FichaCadastroLocatarioData {
       cep: string
     }
   }
-  empresa?: {
-    nome: string
-    cargo: string
-    telefone: string
-    tempo_servico: string
-  }
-  referencias: Array<{
-    nome: string
-    telefone: string
-    relacao: string
-  }>
+  data_emissao: Date | string
 }
 
 // D2 - Ficha Cadastro Fiador

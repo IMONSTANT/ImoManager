@@ -14,6 +14,10 @@ import {
   Briefcase,
   X,
   MapPin,
+  File,
+  FilePlus,
+  FileCheck,
+  FileWarning,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -89,6 +93,33 @@ export function Sidebar({ className, userEmail }: SidebarProps) {
     },
   ]
 
+  const documentosRoutes = [
+    {
+      label: "Todos Documentos",
+      icon: File,
+      href: "/dashboard/documentos",
+      active: pathname === "/dashboard/documentos",
+    },
+    {
+      label: "Gerar Documento",
+      icon: FilePlus,
+      href: "/dashboard/documentos/gerar",
+      active: pathname === "/dashboard/documentos/gerar",
+    },
+    {
+      label: "Pendentes",
+      icon: FileWarning,
+      href: "/dashboard/documentos/pendentes",
+      active: pathname === "/dashboard/documentos/pendentes",
+    },
+    {
+      label: "Assinados",
+      icon: FileCheck,
+      href: "/dashboard/documentos/assinados",
+      active: pathname === "/dashboard/documentos/assinados",
+    },
+  ]
+
   const secondaryRoutes = [
     {
       label: "Soluções",
@@ -161,6 +192,36 @@ export function Sidebar({ className, userEmail }: SidebarProps) {
 
           <div className="space-y-1">
             {imobiliariaRoutes.map((route) => (
+              <Link
+                key={route.href}
+                href={route.href}
+                onClick={close}
+                className={cn(
+                  "flex items-center gap-x-3 text-sm font-medium transition-all duration-200 px-3 py-2.5 rounded-lg group",
+                  route.active
+                    ? "bg-accent text-accent-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                )}
+              >
+                <route.icon className={cn(
+                  "h-4 w-4 transition-transform duration-200",
+                  !route.active && "group-hover:scale-110"
+                )} />
+                {route.label}
+              </Link>
+            ))}
+          </div>
+
+          <Separator className="my-4" />
+
+          <div className="px-3 mb-2">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Documentos
+            </p>
+          </div>
+
+          <div className="space-y-1">
+            {documentosRoutes.map((route) => (
               <Link
                 key={route.href}
                 href={route.href}
