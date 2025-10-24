@@ -38,7 +38,7 @@ export async function GET(
           valor
         ),
         locatario:locatario_id (
-          pessoa_view:pessoa_id (
+          pessoa:pessoa_id (
             nome,
             cpf_cnpj,
             email
@@ -46,7 +46,7 @@ export async function GET(
         ),
         assinaturas:assinatura (
           *,
-          pessoa_view:pessoa_id (
+          pessoa:pessoa_id (
             nome,
             cpf_cnpj,
             email

@@ -215,11 +215,11 @@ async function buscarDadosDocumento({
           ),
           locatarios:locatario (
             *,
-            pessoa_view:pessoa_id (*)
+            pessoa:pessoa_id (*)
           ),
           fiadores:fiador (
             *,
-            pessoa_view:pessoa_id (*)
+            pessoa:pessoa_id (*)
           )
         `)
         .eq('id', contrato_id)
@@ -247,14 +247,14 @@ async function buscarDadosDocumento({
 
         if (contrato.locatarios && contrato.locatarios.length > 0) {
           dados.locatarios = contrato.locatarios.map((loc: any) => ({
-            nome: loc.pessoa_view.nome,
-            cpf: loc.pessoa_view.cpf_cnpj,
-            rg: loc.pessoa_view.rg || '',
-            email: loc.pessoa_view.email,
-            telefone: loc.pessoa_view.telefone,
-            nacionalidade: loc.pessoa_view.nacionalidade || 'Brasileiro(a)',
-            estado_civil: loc.pessoa_view.estado_civil || '',
-            profissao: loc.pessoa_view.profissao || ''
+            nome: loc.pessoa.nome,
+            cpf: loc.pessoa.cpf_cnpj,
+            rg: loc.pessoa.rg || '',
+            email: loc.pessoa.email,
+            telefone: loc.pessoa.telefone,
+            nacionalidade: loc.pessoa.nacionalidade || 'Brasileiro(a)',
+            estado_civil: loc.pessoa.estado_civil || '',
+            profissao: loc.pessoa.profissao || ''
           }));
 
           // Se só tem um locatário, também disponibiliza como objeto único
@@ -266,14 +266,14 @@ async function buscarDadosDocumento({
         if (contrato.fiadores && contrato.fiadores.length > 0) {
           const fiadorData = contrato.fiadores[0];
           dados.fiador = {
-            nome: fiadorData.pessoa_view.nome,
-            cpf: fiadorData.pessoa_view.cpf_cnpj,
-            rg: fiadorData.pessoa_view.rg || '',
-            email: fiadorData.pessoa_view.email,
-            telefone: fiadorData.pessoa_view.telefone,
-            nacionalidade: fiadorData.pessoa_view.nacionalidade || 'Brasileiro(a)',
-            estado_civil: fiadorData.pessoa_view.estado_civil || '',
-            profissao: fiadorData.pessoa_view.profissao || ''
+            nome: fiadorData.pessoa.nome,
+            cpf: fiadorData.pessoa.cpf_cnpj,
+            rg: fiadorData.pessoa.rg || '',
+            email: fiadorData.pessoa.email,
+            telefone: fiadorData.pessoa.telefone,
+            nacionalidade: fiadorData.pessoa.nacionalidade || 'Brasileiro(a)',
+            estado_civil: fiadorData.pessoa.estado_civil || '',
+            profissao: fiadorData.pessoa.profissao || ''
           };
         }
       }
@@ -283,20 +283,20 @@ async function buscarDadosDocumento({
     if (locatario_id && !dados.locatario) {
       const { data: locatario } = await supabase
         .from('locatario')
-        .select('*, pessoa_view:pessoa_id (*)')
+        .select('*, pessoa:pessoa_id (*)')
         .eq('id', locatario_id)
         .single();
 
-      if (locatario && locatario.pessoa_view) {
+      if (locatario && locatario.pessoa) {
         dados.locatario = {
-          nome: locatario.pessoa_view.nome,
-          cpf: locatario.pessoa_view.cpf_cnpj,
-          rg: locatario.pessoa_view.rg || '',
-          email: locatario.pessoa_view.email,
-          telefone: locatario.pessoa_view.telefone,
-          nacionalidade: locatario.pessoa_view.nacionalidade || 'Brasileiro(a)',
-          estado_civil: locatario.pessoa_view.estado_civil || '',
-          profissao: locatario.pessoa_view.profissao || '',
+          nome: locatario.pessoa.nome,
+          cpf: locatario.pessoa.cpf_cnpj,
+          rg: locatario.pessoa.rg || '',
+          email: locatario.pessoa.email,
+          telefone: locatario.pessoa.telefone,
+          nacionalidade: locatario.pessoa.nacionalidade || 'Brasileiro(a)',
+          estado_civil: locatario.pessoa.estado_civil || '',
+          profissao: locatario.pessoa.profissao || '',
           renda_mensal: parseFloat(locatario.renda_mensal || '0')
         };
       }
@@ -306,20 +306,20 @@ async function buscarDadosDocumento({
     if (fiador_id && !dados.fiador) {
       const { data: fiador } = await supabase
         .from('fiador')
-        .select('*, pessoa_view:pessoa_id (*)')
+        .select('*, pessoa:pessoa_id (*)')
         .eq('id', fiador_id)
         .single();
 
-      if (fiador && fiador.pessoa_view) {
+      if (fiador && fiador.pessoa) {
         dados.fiador = {
-          nome: fiador.pessoa_view.nome,
-          cpf: fiador.pessoa_view.cpf_cnpj,
-          rg: fiador.pessoa_view.rg || '',
-          email: fiador.pessoa_view.email,
-          telefone: fiador.pessoa_view.telefone,
-          nacionalidade: fiador.pessoa_view.nacionalidade || 'Brasileiro(a)',
-          estado_civil: fiador.pessoa_view.estado_civil || '',
-          profissao: fiador.pessoa_view.profissao || '',
+          nome: fiador.pessoa.nome,
+          cpf: fiador.pessoa.cpf_cnpj,
+          rg: fiador.pessoa.rg || '',
+          email: fiador.pessoa.email,
+          telefone: fiador.pessoa.telefone,
+          nacionalidade: fiador.pessoa.nacionalidade || 'Brasileiro(a)',
+          estado_civil: fiador.pessoa.estado_civil || '',
+          profissao: fiador.pessoa.profissao || '',
           renda_mensal: parseFloat(fiador.renda_mensal || '0')
         };
       }
