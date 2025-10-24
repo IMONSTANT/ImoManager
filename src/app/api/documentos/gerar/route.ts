@@ -8,22 +8,39 @@ import { createClient } from '@/lib/supabase/server';
 import { DocumentoService } from '@/lib/services/DocumentoService';
 import { getTemplate } from '@/lib/templates';
 import type { DocumentoTipo, GerarDocumentoInput } from '@/lib/types/documento';
+import { DOCUMENT_TEMPLATES } from '@/lib/templates/document-templates';
 
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
 
-    // Verifica autenticação
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Não autorizado' },
-        { status: 401 }
-      );
+    // Verifica autenticação (bypass em modo de teste via header especial)
+    const isTestMode = process.env.NODE_ENV === 'development' &&
+                       request.headers.get('x-test-mode') === 'true';
+
+    let user: any;
+    if (isTestMode) {
+      // Modo de teste: usa usuário mock
+      user = { id: 'test-user-id' };
+      console.log('⚠️  MODO DE TESTE: Autenticação bypassed');
+    } else {
+      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+      if (authError || !authUser) {
+        return NextResponse.json(
+          { error: 'Não autorizado' },
+          { status: 401 }
+        );
+      }
+      user = authUser;
     }
 
     // Parse do body
     const body = await request.json();
+
+    console.log('==========================================');
+    console.log('PAYLOAD RECEBIDO:', JSON.stringify(body, null, 2));
+    console.log('==========================================');
+
     const {
       tipo,
       contrato_id,
@@ -55,23 +72,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Busca template ativo
-    const { data: modelos, error: modeloError } = await supabase
-      .from('documento_modelo')
-      .select('*')
-      .eq('tipo', tipo)
-      .eq('ativo', true)
-      .order('versao', { ascending: false })
-      .limit(1);
+    // Busca template hardcoded
+    const templateConfig = DOCUMENT_TEMPLATES[tipo];
 
-    if (modeloError || !modelos || modelos.length === 0) {
+    if (!templateConfig) {
       return NextResponse.json(
         { error: 'Template não encontrado para este tipo de documento' },
         { status: 404 }
       );
     }
-
-    const modelo = modelos[0];
 
     // Busca dados do banco conforme tipo de documento
     let dados_documento: Record<string, any> = {};
@@ -108,13 +117,17 @@ export async function POST(request: NextRequest) {
     console.log('Dados coletados para geração:', {
       tipo,
       dados_documento,
-      modelo_id: modelo.id,
-      variaveis_esperadas: modelo.variaveis_esperadas
+      template_nome: templateConfig.nome,
+      variaveis_esperadas: templateConfig.variaveis_esperadas,
+      // Mostra estrutura detalhada
+      locatario: dados_documento.locatario,
+      imovel: dados_documento.imovel,
+      contrato: dados_documento.contrato
     });
 
     // Gera o documento usando o service
     const input: GerarDocumentoInput = {
-      modelo_id: modelo.id,
+      modelo_id: null, // Não usamos mais modelo do banco
       tipo,
       dados_documento,
       contrato_id,
@@ -128,7 +141,19 @@ export async function POST(request: NextRequest) {
       gerado_por: user.id
     };
 
-    const documentoGerado = await DocumentoService.gerarDocumento(input, modelo as any);
+    // Cria modelo mock a partir do template hardcoded
+    const modeloMock = {
+      id: null,
+      tipo: templateConfig.tipo,
+      nome: templateConfig.nome,
+      descricao: templateConfig.descricao,
+      template: templateConfig.template,
+      variaveis_esperadas: templateConfig.variaveis_esperadas,
+      versao: 1,
+      ativo: true
+    };
+
+    const documentoGerado = await DocumentoService.gerarDocumento(input, modeloMock as any);
 
     // Gera número de documento
     const { data: numeroData } = await supabase
@@ -212,7 +237,7 @@ async function buscarDadosDocumento({
   try {
     // Busca dados do contrato
     if (contrato_id) {
-      const { data: contrato } = await supabase
+      const { data: contrato, error: contratoError } = await supabase
         .from('contrato_locacao')
         .select(`
           *,
@@ -220,29 +245,43 @@ async function buscarDadosDocumento({
             *,
             endereco:endereco_id (*)
           ),
-          locatarios:locatario (
+          locatario:locatario_id (
             *,
-            pessoa:pessoa_id (
-              *,
-              profissao:profissao_id (nome)
-            )
+            pessoa:pessoa_id (*)
           ),
-          fiadores:fiador (
+          fiador:fiador_id (
             *,
-            pessoa:pessoa_id (
-              *,
-              profissao:profissao_id (nome)
-            )
+            pessoa:pessoa_id (*)
           )
         `)
         .eq('id', contrato_id)
         .single();
 
+      console.log('==========================================');
+      console.log('QUERY SUPABASE - ERRO:', contratoError);
+      console.log('QUERY SUPABASE - CONTRATO COMPLETO:', JSON.stringify(contrato, null, 2));
+      console.log('==========================================');
+      console.log('CONTRATO - IMOVEL:', contrato?.imovel);
+      console.log('CONTRATO - ENDERECO:', contrato?.imovel?.endereco);
+      console.log('CONTRATO - LOCATARIO:', contrato?.locatario);
+      console.log('CONTRATO - PESSOA LOCATARIO:', contrato?.locatario?.pessoa);
+      console.log('CONTRATO - FIADOR:', contrato?.fiador);
+      console.log('CONTRATO - PESSOA FIADOR:', contrato?.fiador?.pessoa);
+      console.log('==========================================');
+
       if (contrato) {
+        console.log('DEBUG - Dados do contrato antes de montar:', {
+          numero_contrato: contrato.numero_contrato,
+          data_inicio: contrato.data_inicio,
+          data_inicio_contrato: contrato.data_inicio_contrato,
+          data_fim: contrato.data_fim,
+          data_fim_contrato: contrato.data_fim_contrato
+        });
+
         dados.contrato = {
           numero: contrato.numero_contrato,
-          data_inicio: contrato.data_inicio,
-          data_fim: contrato.data_fim,
+          data_inicio: contrato.data_inicio_contrato || contrato.data_inicio,
+          data_fim: contrato.data_fim_contrato || contrato.data_fim,
           valor: parseFloat(contrato.valor),
           dia_vencimento: contrato.dia_vencimento,
           indice_reajuste: contrato.indice_reajuste || 'IGPM',
@@ -258,35 +297,55 @@ async function buscarDadosDocumento({
           };
         }
 
-        if (contrato.locatarios && contrato.locatarios.length > 0) {
-          dados.locatarios = contrato.locatarios.map((loc: any) => ({
-            nome: loc.pessoa.nome,
-            cpf: loc.pessoa.cpf_cnpj,
-            rg: loc.pessoa.rg || 'Não informado',
-            email: loc.pessoa.email || '',
-            telefone: loc.pessoa.telefone || '',
-            nacionalidade: 'brasileiro(a)',
-            estado_civil: 'não informado',
-            profissao: loc.pessoa.profissao?.nome || 'Não informada'
-          }));
-
-          // Se só tem um locatário, também disponibiliza como objeto único
-          if (dados.locatarios.length === 1) {
-            dados.locatario = dados.locatarios[0];
+        // Processa locatário (relacionamento 1:1)
+        if (contrato.locatario && contrato.locatario.pessoa) {
+          // Busca profissão separadamente se tiver profissao_id
+          let profissaoNome = 'Não informada';
+          if (contrato.locatario.pessoa.profissao_id) {
+            const { data: profissao } = await supabase
+              .from('profissao')
+              .select('nome')
+              .eq('id', contrato.locatario.pessoa.profissao_id)
+              .single();
+            if (profissao) profissaoNome = profissao.nome;
           }
+
+          dados.locatario = {
+            nome: contrato.locatario.pessoa.nome,
+            cpf: contrato.locatario.pessoa.cpf_cnpj,
+            rg: contrato.locatario.pessoa.rg || 'Não informado',
+            email: contrato.locatario.pessoa.email || '',
+            telefone: contrato.locatario.pessoa.telefone || '',
+            nacionalidade: contrato.locatario.pessoa.nacionalidade || 'brasileiro(a)',
+            estado_civil: contrato.locatario.pessoa.estado_civil || 'não informado',
+            profissao: profissaoNome,
+            renda_mensal: parseFloat(contrato.locatario.renda_mensal || '0')
+          };
         }
 
-        if (contrato.fiadores && contrato.fiadores.length > 0) {
-          const fiadorData = contrato.fiadores[0];
+        // Processa fiador (relacionamento 1:1)
+        if (contrato.fiador && contrato.fiador.pessoa) {
+          // Busca profissão separadamente se tiver profissao_id
+          let profissaoNome = 'Não informada';
+          if (contrato.fiador.pessoa.profissao_id) {
+            const { data: profissao } = await supabase
+              .from('profissao')
+              .select('nome')
+              .eq('id', contrato.fiador.pessoa.profissao_id)
+              .single();
+            if (profissao) profissaoNome = profissao.nome;
+          }
+
           dados.fiador = {
-            nome: fiadorData.pessoa.nome,
-            cpf: fiadorData.pessoa.cpf_cnpj,
-            rg: fiadorData.pessoa.rg || 'Não informado',
-            email: fiadorData.pessoa.email || '',
-            telefone: fiadorData.pessoa.telefone || '',
-            nacionalidade: 'brasileiro(a)',
-            estado_civil: 'não informado',
-            profissao: fiadorData.pessoa.profissao?.nome || 'Não informada'
+            nome: contrato.fiador.pessoa.nome,
+            cpf: contrato.fiador.pessoa.cpf_cnpj,
+            rg: contrato.fiador.pessoa.rg || 'Não informado',
+            email: contrato.fiador.pessoa.email || '',
+            telefone: contrato.fiador.pessoa.telefone || '',
+            nacionalidade: contrato.fiador.pessoa.nacionalidade || 'brasileiro(a)',
+            estado_civil: contrato.fiador.pessoa.estado_civil || 'não informado',
+            profissao: profissaoNome,
+            renda_mensal: parseFloat(contrato.fiador.renda_mensal || '0')
           };
         }
       }
@@ -296,20 +355,31 @@ async function buscarDadosDocumento({
     if (locatario_id && !dados.locatario) {
       const { data: locatario } = await supabase
         .from('locatario')
-        .select('*, pessoa:pessoa_id (*, profissao:profissao_id (nome))')
+        .select('*, pessoa:pessoa_id (*)')
         .eq('id', locatario_id)
         .single();
 
       if (locatario && locatario.pessoa) {
+        // Busca profissão separadamente
+        let profissaoNome = 'Não informada';
+        if (locatario.pessoa.profissao_id) {
+          const { data: profissao } = await supabase
+            .from('profissao')
+            .select('nome')
+            .eq('id', locatario.pessoa.profissao_id)
+            .single();
+          if (profissao) profissaoNome = profissao.nome;
+        }
+
         dados.locatario = {
           nome: locatario.pessoa.nome,
           cpf: locatario.pessoa.cpf_cnpj,
           rg: locatario.pessoa.rg || 'Não informado',
           email: locatario.pessoa.email || '',
           telefone: locatario.pessoa.telefone || '',
-          nacionalidade: 'brasileiro(a)',
-          estado_civil: 'não informado',
-          profissao: locatario.pessoa.profissao?.nome || 'Não informada',
+          nacionalidade: locatario.pessoa.nacionalidade || 'brasileiro(a)',
+          estado_civil: locatario.pessoa.estado_civil || 'não informado',
+          profissao: profissaoNome,
           renda_mensal: parseFloat(locatario.renda_mensal || '0')
         };
       }
@@ -319,20 +389,31 @@ async function buscarDadosDocumento({
     if (fiador_id && !dados.fiador) {
       const { data: fiador } = await supabase
         .from('fiador')
-        .select('*, pessoa:pessoa_id (*, profissao:profissao_id (nome))')
+        .select('*, pessoa:pessoa_id (*)')
         .eq('id', fiador_id)
         .single();
 
       if (fiador && fiador.pessoa) {
+        // Busca profissão separadamente
+        let profissaoNome = 'Não informada';
+        if (fiador.pessoa.profissao_id) {
+          const { data: profissao } = await supabase
+            .from('profissao')
+            .select('nome')
+            .eq('id', fiador.pessoa.profissao_id)
+            .single();
+          if (profissao) profissaoNome = profissao.nome;
+        }
+
         dados.fiador = {
           nome: fiador.pessoa.nome,
           cpf: fiador.pessoa.cpf_cnpj,
           rg: fiador.pessoa.rg || 'Não informado',
           email: fiador.pessoa.email || '',
           telefone: fiador.pessoa.telefone || '',
-          nacionalidade: 'brasileiro(a)',
-          estado_civil: 'não informado',
-          profissao: fiador.pessoa.profissao?.nome || 'Não informada',
+          nacionalidade: fiador.pessoa.nacionalidade || 'brasileiro(a)',
+          estado_civil: fiador.pessoa.estado_civil || 'não informado',
+          profissao: profissaoNome,
           renda_mensal: parseFloat(fiador.renda_mensal || '0')
         };
       }
@@ -394,6 +475,18 @@ async function buscarDadosDocumento({
 
     dados.proprietario = dados.locador;
 
+    console.log('==========================================');
+    console.log('DADOS FINAIS MONTADOS:');
+    console.log('- Tem Locatario?', !!dados.locatario);
+    console.log('- Locatario:', dados.locatario);
+    console.log('- Tem Imovel?', !!dados.imovel);
+    console.log('- Imovel:', dados.imovel);
+    console.log('- Tem Contrato?', !!dados.contrato);
+    console.log('- Contrato:', dados.contrato);
+    console.log('- Todas as chaves:', Object.keys(dados));
+    console.log('- DADOS COMPLETOS:', JSON.stringify(dados, null, 2));
+    console.log('==========================================');
+
     return Object.keys(dados).length > 0 ? dados : null;
 
   } catch (error) {
@@ -410,7 +503,7 @@ function formatarEnderecoCompleto(endereco: any): string {
     endereco.numero,
     endereco.complemento,
     endereco.bairro,
-    `${endereco.cidade}/${endereco.estado}`
+    `${endereco.cidade}/${endereco.uf}`
   ].filter(Boolean);
 
   return partes.join(', ');

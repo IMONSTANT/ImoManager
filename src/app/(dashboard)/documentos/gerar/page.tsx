@@ -111,6 +111,28 @@ const DOCUMENTO_DESCRICOES: Record<DocumentoTipo, string> = {
   D10: 'Comprovante de pagamento de aluguel',
 }
 
+/**
+ * Extrai apenas o conteúdo dentro da tag <body> do HTML completo
+ */
+function extractBodyContent(html: string): string {
+  const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i)
+  if (bodyMatch && bodyMatch[1]) {
+    return bodyMatch[1]
+  }
+  return html
+}
+
+/**
+ * Extrai os estilos do <head> para aplicar no preview
+ */
+function extractStyles(html: string): string {
+  const styleMatch = html.match(/<style[^>]*>([\s\S]*?)<\/style>/gi)
+  if (styleMatch) {
+    return styleMatch.join('\n')
+  }
+  return ''
+}
+
 export default function GerarDocumentoPage() {
   const router = useRouter()
   const { toast } = useToast()
@@ -607,8 +629,13 @@ export default function GerarDocumentoPage() {
               <CardDescription>Visualização do conteúdo do documento</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="border rounded-lg p-6 max-h-96 overflow-y-auto bg-white">
-                <div dangerouslySetInnerHTML={{ __html: previewHTML }} />
+              <div className="border rounded-lg max-h-96 overflow-y-auto bg-white">
+                {/* Injeta os estilos do documento */}
+                {extractStyles(previewHTML) && (
+                  <div dangerouslySetInnerHTML={{ __html: extractStyles(previewHTML) }} />
+                )}
+                {/* Renderiza apenas o conteúdo do body */}
+                <div dangerouslySetInnerHTML={{ __html: extractBodyContent(previewHTML) }} />
               </div>
             </CardContent>
           </Card>

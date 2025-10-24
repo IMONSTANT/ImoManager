@@ -152,6 +152,15 @@ export class DocumentoService {
     const dataKeys = this.extractKeys(input.dados_documento)
     const missingVars = modelo.variaveis_esperadas.filter(v => !dataKeys.includes(v))
 
+    console.log('==========================================');
+    console.log('VALIDAÇÃO DE TEMPLATE:');
+    console.log('- Tipo documento:', input.tipo);
+    console.log('- Variáveis esperadas:', modelo.variaveis_esperadas);
+    console.log('- Chaves extraídas dos dados:', dataKeys);
+    console.log('- Variáveis faltando:', missingVars);
+    console.log('- Dados recebidos:', JSON.stringify(input.dados_documento, null, 2));
+    console.log('==========================================');
+
     if (missingVars.length > 0) {
       console.error('Dados incompletos para o template:', {
         missingVars,
@@ -211,11 +220,18 @@ export class DocumentoService {
 
     for (const key in obj) {
       const fullKey = prefix ? `${prefix}.${key}` : key
-      if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
-        keys.push(fullKey)
-        keys = keys.concat(this.extractKeys(obj[key], fullKey))
-      } else {
-        keys.push(fullKey)
+      const value = obj[key]
+
+      // Sempre adiciona a chave, mesmo se o valor for null/undefined
+      keys.push(fullKey)
+
+      // Se for objeto (e não null, array ou Date), extrai chaves aninhadas
+      if (value !== null &&
+          value !== undefined &&
+          typeof value === 'object' &&
+          !Array.isArray(value) &&
+          !(value instanceof Date)) {
+        keys = keys.concat(this.extractKeys(value, fullKey))
       }
     }
 

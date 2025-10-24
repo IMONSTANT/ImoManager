@@ -380,3 +380,54 @@ textarea::-ms-input-placeholder {
 [data-radix-portal] > * {
   pointer-events: auto;
 }
+
+/* ============================================
+   CRITICAL OPACITY FIX FOR ALL BACKGROUNDS
+   Forces 100% opacity on all UI components
+   ============================================ */
+
+/* Force opacity on Tailwind background classes */
+.bg-popover {
+  background-color: hsl(var(--color-popover)) !important;
+  opacity: 1 !important;
+}
+
+.bg-card {
+  background-color: hsl(var(--color-card)) !important;
+  opacity: 1 !important;
+}
+
+.bg-background {
+  background-color: hsl(var(--color-background)) !important;
+  opacity: 1 !important;
+}
+
+.bg-muted {
+  background-color: hsl(var(--color-muted)) !important;
+  opacity: 1 !important;
+}
+
+/* Ensure all Radix UI components are opaque */
+[role="listbox"],
+[role="menu"],
+[role="dialog"],
+[data-radix-select-content],
+[data-radix-dropdown-menu-content],
+[data-radix-popover-content],
+[data-radix-alert-dialog-content],
+[data-radix-dialog-content] {
+  background-color: hsl(var(--color-popover)) !important;
+  opacity: 1 !important;
+}
+
+/* Force opacity on Select viewport */
+[data-radix-select-viewport] {
+  opacity: 1 !important;
+}
+
+/* Toast notifications must be opaque */
+.toast,
+[data-sonner-toast] {
+  background-color: hsl(var(--color-background)) !important;
+  opacity: 1 !important;
+}

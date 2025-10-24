@@ -220,6 +220,8 @@ describe('useCreateLocacao', () => {
             cpf_cnpj: '123.456.789-00',
             email: 'joao@email.com',
             telefone: '(11) 98765-4321',
+            nacionalidade: 'brasileiro(a)',
+            estado_civil: 'solteiro(a)',
             endereco: {
               logradouro: 'Rua A',
               numero: '100',
@@ -305,6 +307,8 @@ describe('useCreateLocacao', () => {
             cpf_cnpj: '123.456.789-00',
             email: 'joao@email.com',
             telefone: '(11) 98765-4321',
+            nacionalidade: 'brasileiro(a)',
+            estado_civil: 'solteiro(a)',
             endereco: {
               logradouro: 'Rua A',
               numero: '100',
@@ -375,6 +379,8 @@ describe('useCreateLocacao', () => {
             cpf_cnpj: '123.456.789-00',
             email: 'joao@email.com',
             telefone: '(11) 98765-4321',
+            nacionalidade: 'brasileiro(a)',
+            estado_civil: 'solteiro(a)',
             endereco: {
               logradouro: 'Rua A',
               numero: '100',
