@@ -102,7 +102,7 @@ export function FiadorForm({ initialData, fiadorId, onSuccess, onCancel }: Fiado
                             <SelectItem key={pessoa.id} value={pessoa.id.toString()}>
                               <div className="flex items-center gap-2">
                                 <User className="h-4 w-4" />
-                                {pessoa.nome} {pessoa.cpf_cnpj && `- CPF/CNPJ: ${pessoa.cpf_cnpj}`}
+                                {pessoa.nome} {pessoa.cpf && `- CPF: ${pessoa.cpf}`}
                               </div>
                             </SelectItem>
                           ))

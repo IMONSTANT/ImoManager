@@ -148,16 +148,23 @@ export function useGerarDocumento() {
   return useMutation({
     mutationFn: async (input: GerarDocumentoInput) => {
       const supabase = createClient()
-      // 1. Buscar o modelo do documento
-      const { data: modelo, error: modeloError } = await supabase
-        .from('documento_modelo')
-        .select('*')
-        .eq('id', input.modelo_id)
-        .eq('ativo', true)
-        .single()
 
-      if (modeloError || !modelo) {
-        throw new Error('Modelo de documento não encontrado')
+      let modelo = null
+
+      // 1. Buscar o modelo do documento (se modelo_id foi fornecido)
+      if (input.modelo_id !== null) {
+        const { data: modeloData, error: modeloError } = await supabase
+          .from('documento_modelo')
+          .select('*')
+          .eq('id', input.modelo_id)
+          .eq('ativo', true)
+          .single()
+
+        if (modeloError || !modeloData) {
+          throw new Error('Modelo de documento não encontrado')
+        }
+
+        modelo = modeloData
       }
 
       // 2. Gerar o documento usando o service
@@ -168,7 +175,7 @@ export function useGerarDocumento() {
         tipo: input.tipo,
         contrato_id: input.contrato_id,
         locatario_id: input.locatario_id,
-        html_content: modelo.template, // Temporary placeholder
+        html_content: modelo?.template || '', // Temporary placeholder
         storage_path: '',
       }
 
@@ -184,7 +191,7 @@ export function useGerarDocumento() {
           ...documentoData,
           numero_documento: proximoNumero,
           gerado_por: (await supabase.auth.getUser()).data.user?.id,
-        })
+        } as any)
         .select()
         .single()
 

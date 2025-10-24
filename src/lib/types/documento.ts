@@ -69,7 +69,7 @@ export interface DocumentoModelo {
 
 export interface DocumentoInstancia {
   id: number
-  modelo_id: number
+  modelo_id: number | null
   numero_documento: string
   tipo: DocumentoTipo
   status: DocumentoStatus
@@ -187,7 +187,7 @@ export interface TemplateData {
 }
 
 export interface GerarDocumentoInput {
-  modelo_id: number
+  modelo_id: number | null
   tipo: DocumentoTipo
   dados_documento: TemplateData
   contrato_id?: number
