@@ -1,0 +1,501 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatório E2E: Locatarios CRUD - Relatório de Testes E2E</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      font-size: 36px;
+      color: #1a202c;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: #718096;
+      font-size: 16px;
+      margin-bottom: 30px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .summary-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 15px;
+      padding: 25px;
+      color: white;
+      text-align: center;
+    }
+
+    .summary-card.success {
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+
+    .summary-card.error {
+      background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+    }
+
+    .summary-number {
+      font-size: 48px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .summary-label {
+      font-size: 14px;
+      opacity: 0.9;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+      gap: 25px;
+    }
+
+    .result-card {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .result-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    .result-header {
+      padding: 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 2px solid #f7fafc;
+    }
+
+    .result-header.success {
+      background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    }
+
+    .result-header.error {
+      background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    }
+
+    .result-title {
+      flex: 1;
+    }
+
+    .result-nome {
+      font-size: 18px;
+      font-weight: bold;
+      color: #1a202c;
+    }
+
+    .result-badge {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .result-badge.success {
+      background: #4caf50;
+      color: white;
+    }
+
+    .result-badge.error {
+      background: #f44336;
+      color: white;
+    }
+
+    .result-body {
+      padding: 25px;
+    }
+
+    .error-message {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+
+    .error-message strong {
+      color: #856404;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .error-message p {
+      color: #856404;
+      font-size: 14px;
+    }
+
+    .success-message {
+      background: #d4edda;
+      border-left: 4px solid #28a745;
+      padding: 15px;
+      border-radius: 5px;
+      color: #155724;
+    }
+
+    .meta-info {
+      display: flex;
+      gap: 15px;
+      margin-top: 10px;
+      font-size: 12px;
+      color: #718096;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .details-section {
+      margin-top: 15px;
+      padding: 15px;
+      background: #f7fafc;
+      border-radius: 8px;
+      font-size: 12px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .recommendations {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      margin-top: 30px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+
+    .recommendations h2 {
+      color: #1a202c;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>📊 Relatório E2E: Locatarios CRUD</h1>
+      <p class="subtitle">
+        Gerado em: 24/10/2025, 15:03:35<br>
+        Tempo total de execução: 1239ms
+      </p>
+
+      <div class="summary">
+        <div class="summary-card">
+          <div class="summary-number">6</div>
+          <div class="summary-label">Total de Testes</div>
+        </div>
+        <div class="summary-card success">
+          <div class="summary-number">6</div>
+          <div class="summary-label">Aprovados</div>
+        </div>
+        <div class="summary-card error">
+          <div class="summary-number">0</div>
+          <div class="summary-label">Falharam</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-number">100.0%</div>
+          <div class="summary-label">Taxa de Sucesso</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Grid -->
+    <div class="results-grid">
+      
+        <div class="result-card">
+          <div class="result-header success">
+            <div class="result-title">
+              <div class="result-nome">Pessoa para Locatario - CREATE</div>
+            </div>
+            <div class="result-badge success">
+              ✅ Passou
+            </div>
+          </div>
+
+          <div class="result-body">
+            
+              <div class="success-message">
+                ✅ Operação executada com sucesso!
+              </div>
+            
+
+            
+              <div class="details-section">
+                {
+  "id": 152,
+  "data": {
+    "id": 152,
+    "nome": "Maria Costa",
+    "data_nascimento": "2003-02-25",
+    "cpf": "80235334420",
+    "rg": "56797775",
+    "profissao_id": null,
+    "endereco_id": null,
+    "email": "maria.costa@teste.com",
+    "telefone": "(84) 93140-7680",
+    "data_registro": "2025-10-24",
+    "observacoes": "Cadastro criado via teste automatizado",
+    "created_at": "2025-10-24T18:03:34.556036+00:00",
+    "updated_at": "2025-10-24T18:03:34.556036+00:00",
+    "deleted_at": 
+              </div>
+            
+
+            <div class="meta-info">
+              <div class="meta-item">
+                ⏱️ 325ms
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="result-card">
+          <div class="result-header success">
+            <div class="result-title">
+              <div class="result-nome">Locatario - CREATE</div>
+            </div>
+            <div class="result-badge success">
+              ✅ Passou
+            </div>
+          </div>
+
+          <div class="result-body">
+            
+              <div class="success-message">
+                ✅ Operação executada com sucesso!
+              </div>
+            
+
+            
+              <div class="details-section">
+                {
+  "id": 21,
+  "data": {
+    "id": 21,
+    "pessoa_id": 152,
+    "referencias": "Referências comerciais e pessoais - Teste automatizado",
+    "renda_mensal": 12124,
+    "created_at": "2025-10-24T18:03:34.731759+00:00",
+    "updated_at": "2025-10-24T18:03:34.731759+00:00",
+    "deleted_at": null
+  }
+}
+              </div>
+            
+
+            <div class="meta-info">
+              <div class="meta-item">
+                ⏱️ 208ms
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="result-card">
+          <div class="result-header success">
+            <div class="result-title">
+              <div class="result-nome">Locatario - LIST</div>
+            </div>
+            <div class="result-badge success">
+              ✅ Passou
+            </div>
+          </div>
+
+          <div class="result-body">
+            
+              <div class="success-message">
+                ✅ Operação executada com sucesso!
+              </div>
+            
+
+            
+              <div class="details-section">
+                {
+  "count": 14,
+  "sample": {
+    "id": 21,
+    "pessoa_id": 152,
+    "referencias": "Referências comerciais e pessoais - Teste automatizado",
+    "renda_mensal": 12124,
+    "created_at": "2025-10-24T18:03:34.731759+00:00",
+    "updated_at": "2025-10-24T18:03:34.731759+00:00",
+    "deleted_at": null
+  }
+}
+              </div>
+            
+
+            <div class="meta-info">
+              <div class="meta-item">
+                ⏱️ 153ms
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="result-card">
+          <div class="result-header success">
+            <div class="result-title">
+              <div class="result-nome">Locatario - GET</div>
+            </div>
+            <div class="result-badge success">
+              ✅ Passou
+            </div>
+          </div>
+
+          <div class="result-body">
+            
+              <div class="success-message">
+                ✅ Operação executada com sucesso!
+              </div>
+            
+
+            
+              <div class="details-section">
+                {
+  "id": 21,
+  "pessoa_id": 152,
+  "referencias": "Referências comerciais e pessoais - Teste automatizado",
+  "renda_mensal": 12124,
+  "created_at": "2025-10-24T18:03:34.731759+00:00",
+  "updated_at": "2025-10-24T18:03:34.731759+00:00",
+  "deleted_at": null
+}
+              </div>
+            
+
+            <div class="meta-info">
+              <div class="meta-item">
+                ⏱️ 141ms
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="result-card">
+          <div class="result-header success">
+            <div class="result-title">
+              <div class="result-nome">Locatario - UPDATE</div>
+            </div>
+            <div class="result-badge success">
+              ✅ Passou
+            </div>
+          </div>
+
+          <div class="result-body">
+            
+              <div class="success-message">
+                ✅ Operação executada com sucesso!
+              </div>
+            
+
+            
+              <div class="details-section">
+                {
+  "id": 21,
+  "pessoa_id": 152,
+  "referencias": "Referências atualizadas via teste",
+  "renda_mensal": 12124,
+  "created_at": "2025-10-24T18:03:34.731759+00:00",
+  "updated_at": "2025-10-24T18:03:35.234167+00:00",
+  "deleted_at": null
+}
+              </div>
+            
+
+            <div class="meta-info">
+              <div class="meta-item">
+                ⏱️ 209ms
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="result-card">
+          <div class="result-header success">
+            <div class="result-title">
+              <div class="result-nome">Locatario - DELETE</div>
+            </div>
+            <div class="result-badge success">
+              ✅ Passou
+            </div>
+          </div>
+
+          <div class="result-body">
+            
+              <div class="success-message">
+                ✅ Operação executada com sucesso!
+              </div>
+            
+
+            
+
+            <div class="meta-info">
+              <div class="meta-item">
+                ⏱️ 203ms
+              </div>
+            </div>
+          </div>
+        </div>
+      
+    </div>
+
+    <!-- Summary -->
+    
+      <div class="recommendations" style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);">
+        <h2>🎉 Parabéns! Todos os testes passaram!</h2>
+        <p style="color: #2e7d32; font-size: 16px; margin-top: 10px;">
+          Todos os testes de Relatório E2E: Locatarios CRUD foram executados com sucesso. O sistema está funcionando corretamente!
+        </p>
+      </div>
+    
+  </div>
+</body>
+</html>
+    

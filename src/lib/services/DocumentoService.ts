@@ -31,13 +31,15 @@ import type {
 // =====================================================
 
 // Formatar moeda brasileira
-Handlebars.registerHelper('formatMoney', (value: number): string => {
+const formatMoneyHelper = (value: number): string => {
   if (typeof value !== 'number') return ''
   return value.toLocaleString('pt-BR', {
     style: 'currency',
     currency: 'BRL',
   })
-})
+}
+Handlebars.registerHelper('formatMoney', formatMoneyHelper)
+Handlebars.registerHelper('formatCurrency', formatMoneyHelper) // Alias
 
 // Formatar data
 Handlebars.registerHelper('formatDate', (value: Date | string): string => {

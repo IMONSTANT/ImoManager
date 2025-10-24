@@ -1,0 +1,1003 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatório E2E: Contratos CRUD (Workflow Completo) - Relatório de Testes E2E</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      font-size: 36px;
+      color: #1a202c;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: #718096;
+      font-size: 16px;
+      margin-bottom: 30px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .summary-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 15px;
+      padding: 25px;
+      color: white;
+      text-align: center;
+    }
+
+    .summary-card.success {
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+
+    .summary-card.error {
+      background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+    }
+
+    .summary-number {
+      font-size: 48px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .summary-label {
+      font-size: 14px;
+      opacity: 0.9;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+      gap: 25px;
+    }
+
+    .result-card {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .result-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    .result-header {
+      padding: 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 2px solid #f7fafc;
+    }
+
+    .result-header.success {
+      background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    }
+
+    .result-header.error {
+      background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    }
+
+    .result-title {
+      flex: 1;
+    }
+
+    .result-nome {
+      font-size: 18px;
+      font-weight: bold;
+      color: #1a202c;
+    }
+
+    .result-badge {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .result-badge.success {
+      background: #4caf50;
+      color: white;
+    }
+
+    .result-badge.error {
+      background: #f44336;
+      color: white;
+    }
+
+    .result-body {
+      padding: 25px;
+    }
+
+    .error-message {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+
+    .error-message strong {
+      color: #856404;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .error-message p {
+      color: #856404;
+      font-size: 14px;
+    }
+
+    .success-message {
+      background: #d4edda;
+      border-left: 4px solid #28a745;
+      padding: 15px;
+      border-radius: 5px;
+      color: #155724;
+    }
+
+    .meta-info {
+      display: flex;
+      gap: 15px;
+      margin-top: 10px;
+      font-size: 12px;
+      color: #718096;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .details-section {
+      margin-top: 15px;
+      padding: 15px;
+      background: #f7fafc;
+      border-radius: 8px;
+      font-size: 12px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .recommendations {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      margin-top: 30px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+
+    .recommendations h2 {
+      color: #1a202c;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>📊 Relatório E2E: Contratos CRUD (Workflow Completo)</h1>
+      <p class="subtitle">
+        Gerado em: 24/10/2025, 15:03:59<br>
+        Tempo total de execução: 3463ms
+      </p>
+
+      <div class="summary">
+        <div class="summary-card">
+          <div class="summary-number">17</div>
+          <div class="summary-label">Total de Testes</div>
+        </div>
+        <div class="summary-card success">
+          <div class="summary-number">17</div>
+          <div class="summary-label">Aprovados</div>
+        </div>
+        <div class="summary-card error">
+          <div class="summary-number">0</div>
+          <div class="summary-label">Falharam</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-number">100.0%</div>
+          <div class="summary-label">Taxa de Sucesso</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Grid -->
+    <div class="results-grid">
+      
+        <div class="result-card">
+          <div class="result-header success">
+            <div class="result-title">
+              <div class="result-nome">Endereco - CREATE</div>
+            </div>
+            <div class="result-badge success">
+              ✅ Passou
+            </div>
+          </div>
+
+          <div class="result-body">
+            
+              <div class="success-message">
+                ✅ Operação executada com sucesso!
+              </div>
+            
+
+            
+              <div class="details-section">
+                {
+  "id": 33,
+  "data": {
+    "id": 33,
+    "cep": "36889650",
+    "logradouro": "Av. Principal",
+    "numero": "8539",
+    "complemento": "",
+    "bairro": "Jardim América",
+    "cidade": "Porto Alegre",
+    "uf": "MG",
+    "pais": "Brasil",
+    "created_at": "2025-10-24T18:03:56.681471+00:00",
+    "updated_at": "2025-10-24T18:03:56.681471+00:00",
+    "deleted_at": null
+  }
+}
+              </div>
+            
+
+            <div class="meta-info">
+              <div class="meta-item">
+                ⏱️ 312ms
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="result-card">
+          <div class="result-header success">
+            <div class="result-title">
+              <div class="result-nome">Pessoa Locador - CREATE</div>
+            </div>
+            <div class="result-badge success">
+              ✅ Passou
+            </div>
+          </div>
+
+          <div class="result-body">
+            
+              <div class="success-message">
+                ✅ Operação executada com sucesso!
+              </div>
+            
+
+            
+              <div class="details-section">
+                {
+  "id": 155,
+  "data": {
+    "id": 155,
+    "nome": "Pedro Souza",
+    "data_nascimento": "2005-06-04",
+    "cpf": "23097916854",
+    "rg": "26045433",
+    "profissao_id": null,
+    "endereco_id": null,
+    "email": "pedro.souza@teste.com",
+    "telefone": "(36) 99443-2481",
+    "data_registro": "2025-10-24",
+    "observacoes": "Cadastro criado via teste automatizado",
+    "created_at": "2025-10-24T18:03:56.846932+00:00",
+    "updated_at": "2025-10-24T18:03:56.846932+00:00",
+    "deleted_at": 
+              </div>
+            
+
+            <div class="meta-info">
+              <div class="meta-item">
+                ⏱️ 207ms
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="result-card">
+          <div class="result-header success">
+            <div class="result-title">
+              <div class="result-nome">Locador - CREATE</div>
+            </div>
+            <div class="result-badge success">
+              ✅ Passou
+            </div>
+          </div>
+
+          <div class="result-body">
+            
+              <div class="success-message">
+                ✅ Operação executada com sucesso!
+              </div>
+            
+
+            
+              <div class="details-section">
+                {
+  "id": 43,
+  "data": {
+    "id": 43,
+    "pessoa_id": 155,
+    "tipo_pessoa": "fisica",
+    "cnpj": null,
+    "razao_social": null,
+    "created_at": "2025-10-24T18:03:57.046242+00:00",
+    "updated_at": "2025-10-24T18:03:57.046242+00:00",
+    "deleted_at": null
+  }
+}
+              </div>
+            
+
+            <div class="meta-info">
+              <div class="meta-item">
+                ⏱️ 202ms
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="result-card">
+          <div class="result-header success">
+            <div class="result-title">
+              <div class="result-nome">Tipo Imovel - CREATE</div>
+            </div>
+            <div class="result-badge success">
+              ✅ Passou
+            </div>
+          </div>
+
+          <div class="result-body">
+            
+              <div class="success-message">
+                ✅ Operação executada com sucesso!
+              </div>
+            
+
+            
+              <div class="details-section">
+                {
+  "id": 51,
+  "data": {
+    "id": 51,
+    "descricao": "Studio 1761329037180",
+    "created_at": "2025-10-24T18:03:57.25857+00:00",
+    "updated_at": "2025-10-24T18:03:57.25857+00:00",
+    "deleted_at": null
+  }
+}
+              </div>
+            
+
+            <div class="meta-info">
+              <div class="meta-item">
+                ⏱️ 202ms
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="result-card">
+          <div class="result-header success">
+            <div class="result-title">
+              <div class="result-nome">Imovel - CREATE</div>
+            </div>
+            <div class="result-badge success">
+              ✅ Passou
+            </div>
+          </div>
+
+          <div class="result-body">
+            
+              <div class="success-message">
+                ✅ Operação executada com sucesso!
+              </div>
+            
+
+            
+              <div class="details-section">
+                {
+  "id": 21,
+  "data": {
+    "id": 21,
+    "endereco_id": 33,
+    "locador_id": 43,
+    "tipo_imovel_id": 51,
+    "codigo_imovel": "COD-380283",
+    "descricao": "Imóvel para locação - Teste automatizado",
+    "area_total": 241,
+    "area_construida": 153,
+    "quartos": 1,
+    "banheiros": 2,
+    "vagas_garagem": 2,
+    "valor_aluguel": 5584,
+    "valor_condominio": 488,
+    "iptu": 483,
+    "disponivel": true,
+    "data_disponibilidade": "2025-08-17",
+    "observacoes": "Imóvel criado via tes
+              </div>
+            
+
+            <div class="meta-info">
+              <div class="meta-item">
+                ⏱️ 146ms
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="result-card">
+          <div class="result-header success">
+            <div class="result-title">
+              <div class="result-nome">Pessoa Locatario - CREATE</div>
+            </div>
+            <div class="result-badge success">
+              ✅ Passou
+            </div>
+          </div>
+
+          <div class="result-body">
+            
+              <div class="success-message">
+                ✅ Operação executada com sucesso!
+              </div>
+            
+
+            
+              <div class="details-section">
+                {
+  "id": 156,
+  "data": {
+    "id": 156,
+    "nome": "Carlos Oliveira",
+    "data_nascimento": "2006-06-30",
+    "cpf": "06035143905",
+    "rg": "14920346",
+    "profissao_id": null,
+    "endereco_id": null,
+    "email": "carlos.oliveira@teste.com",
+    "telefone": "(80) 92651-7439",
+    "data_registro": "2025-10-24",
+    "observacoes": "Cadastro criado via teste automatizado",
+    "created_at": "2025-10-24T18:03:57.602254+00:00",
+    "updated_at": "2025-10-24T18:03:57.602254+00:00",
+    "delet
+              </div>
+            
+
+            <div class="meta-info">
+              <div class="meta-item">
+                ⏱️ 141ms
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="result-card">
+          <div class="result-header success">
+            <div class="result-title">
+              <div class="result-nome">Locatario - CREATE</div>
+            </div>
+            <div class="result-badge success">
+              ✅ Passou
+            </div>
+          </div>
+
+          <div class="result-body">
+            
+              <div class="success-message">
+                ✅ Operação executada com sucesso!
+              </div>
+            
+
+            
+              <div class="details-section">
+                {
+  "id": 22,
+  "data": {
+    "id": 22,
+    "pessoa_id": 156,
+    "referencias": "Referências comerciais e pessoais - Teste automatizado",
+    "renda_mensal": 8098,
+    "created_at": "2025-10-24T18:03:57.746944+00:00",
+    "updated_at": "2025-10-24T18:03:57.746944+00:00",
+    "deleted_at": null
+  }
+}
+              </div>
+            
+
+            <div class="meta-info">
+              <div class="meta-item">
+                ⏱️ 221ms
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="result-card">
+          <div class="result-header success">
+            <div class="result-title">
+              <div class="result-nome">Tipo Locacao - CREATE</div>
+            </div>
+            <div class="result-badge success">
+              ✅ Passou
+            </div>
+          </div>
+
+          <div class="result-body">
+            
+              <div class="success-message">
+                ✅ Operação executada com sucesso!
+              </div>
+            
+
+            
+              <div class="details-section">
+                {
+  "id": 23,
+  "data": {
+    "id": 23,
+    "descricao": "Residencial Teste 1761329037897",
+    "created_at": "2025-10-24T18:03:57.968553+00:00",
+    "updated_at": "2025-10-24T18:03:57.968553+00:00",
+    "deleted_at": null
+  }
+}
+              </div>
+            
+
+            <div class="meta-info">
+              <div class="meta-item">
+                ⏱️ 202ms
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="result-card">
+          <div class="result-header success">
+            <div class="result-title">
+              <div class="result-nome">Contrato - CREATE</div>
+            </div>
+            <div class="result-badge success">
+              ✅ Passou
+            </div>
+          </div>
+
+          <div class="result-body">
+            
+              <div class="success-message">
+                ✅ Operação executada com sucesso!
+              </div>
+            
+
+            
+              <div class="details-section">
+                {
+  "id": 23,
+  "data": {
+    "id": 23,
+    "numero_contrato": "CTR2025000023",
+    "imovel_id": 21,
+    "locatario_id": 22,
+    "fiador_id": null,
+    "tipo_locacao_id": 23,
+    "valor": 2944,
+    "caucao": null,
+    "valor_iptu": 353,
+    "valor_condominio": 290,
+    "data_inicio_contrato": "2025-03-18",
+    "data_fim_contrato": "2027-11-05",
+    "data_vencimento_aluguel": 10,
+    "indice_reajuste": "IGPM",
+    "periodicidade_reajuste": 12,
+    "data_ultimo_reajuste": null,
+    "status": "ativ
+              </div>
+            
+
+            <div class="meta-info">
+              <div class="meta-item">
+                ⏱️ 162ms
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="result-card">
+          <div class="result-header success">
+            <div class="result-title">
+              <div class="result-nome">Contrato - LIST</div>
+            </div>
+            <div class="result-badge success">
+              ✅ Passou
+            </div>
+          </div>
+
+          <div class="result-body">
+            
+              <div class="success-message">
+                ✅ Operação executada com sucesso!
+              </div>
+            
+
+            
+              <div class="details-section">
+                {
+  "count": 3,
+  "sample": {
+    "id": 23,
+    "numero_contrato": "CTR2025000023",
+    "imovel_id": 21,
+    "locatario_id": 22,
+    "fiador_id": null,
+    "tipo_locacao_id": 23,
+    "valor": 2944,
+    "caucao": null,
+    "valor_iptu": 353,
+    "valor_condominio": 290,
+    "data_inicio_contrato": "2025-03-18",
+    "data_fim_contrato": "2027-11-05",
+    "data_vencimento_aluguel": 10,
+    "indice_reajuste": "IGPM",
+    "periodicidade_reajuste": 12,
+    "data_ultimo_reajuste": null,
+    "status": "
+              </div>
+            
+
+            <div class="meta-info">
+              <div class="meta-item">
+                ⏱️ 201ms
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="result-card">
+          <div class="result-header success">
+            <div class="result-title">
+              <div class="result-nome">Contrato LIST com ORDER BY - FRONTEND SIMULATION</div>
+            </div>
+            <div class="result-badge success">
+              ✅ Passou
+            </div>
+          </div>
+
+          <div class="result-body">
+            
+              <div class="success-message">
+                ✅ Operação executada com sucesso!
+              </div>
+            
+
+            
+              <div class="details-section">
+                {
+  "count": 3
+}
+              </div>
+            
+
+            <div class="meta-info">
+              <div class="meta-item">
+                ⏱️ 205ms
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="result-card">
+          <div class="result-header success">
+            <div class="result-title">
+              <div class="result-nome">Contrato - GET</div>
+            </div>
+            <div class="result-badge success">
+              ✅ Passou
+            </div>
+          </div>
+
+          <div class="result-body">
+            
+              <div class="success-message">
+                ✅ Operação executada com sucesso!
+              </div>
+            
+
+            
+              <div class="details-section">
+                {
+  "id": 23,
+  "numero_contrato": "CTR2025000023",
+  "imovel_id": 21,
+  "locatario_id": 22,
+  "fiador_id": null,
+  "tipo_locacao_id": 23,
+  "valor": 2944,
+  "caucao": null,
+  "valor_iptu": 353,
+  "valor_condominio": 290,
+  "data_inicio_contrato": "2025-03-18",
+  "data_fim_contrato": "2027-11-05",
+  "data_vencimento_aluguel": 10,
+  "indice_reajuste": "IGPM",
+  "periodicidade_reajuste": 12,
+  "data_ultimo_reajuste": null,
+  "status": "ativo",
+  "dia_vencimento": 9,
+  "observacoes": "Contrato cria
+              </div>
+            
+
+            <div class="meta-info">
+              <div class="meta-item">
+                ⏱️ 245ms
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="result-card">
+          <div class="result-header success">
+            <div class="result-title">
+              <div class="result-nome">Contrato GET com joins - FRONTEND SIMULATION</div>
+            </div>
+            <div class="result-badge success">
+              ✅ Passou
+            </div>
+          </div>
+
+          <div class="result-body">
+            
+              <div class="success-message">
+                ✅ Operação executada com sucesso!
+              </div>
+            
+
+            
+              <div class="details-section">
+                {
+  "hasAllRelations": true,
+  "relations": {
+    "imovel": true,
+    "locatario": true,
+    "tipo_locacao": true,
+    "fiador": false
+  }
+}
+              </div>
+            
+
+            <div class="meta-info">
+              <div class="meta-item">
+                ⏱️ 265ms
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="result-card">
+          <div class="result-header success">
+            <div class="result-title">
+              <div class="result-nome">Contrato - UPDATE</div>
+            </div>
+            <div class="result-badge success">
+              ✅ Passou
+            </div>
+          </div>
+
+          <div class="result-body">
+            
+              <div class="success-message">
+                ✅ Operação executada com sucesso!
+              </div>
+            
+
+            
+              <div class="details-section">
+                {
+  "id": 23,
+  "numero_contrato": "CTR2025000023",
+  "imovel_id": 21,
+  "locatario_id": 22,
+  "fiador_id": null,
+  "tipo_locacao_id": 23,
+  "valor": 2944,
+  "caucao": null,
+  "valor_iptu": 353,
+  "valor_condominio": 290,
+  "data_inicio_contrato": "2025-03-18",
+  "data_fim_contrato": "2027-11-05",
+  "data_vencimento_aluguel": 10,
+  "indice_reajuste": "IGPM",
+  "periodicidade_reajuste": 12,
+  "data_ultimo_reajuste": null,
+  "status": "ativo",
+  "dia_vencimento": 9,
+  "observacoes": "Contrato atua
+              </div>
+            
+
+            <div class="meta-info">
+              <div class="meta-item">
+                ⏱️ 148ms
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="result-card">
+          <div class="result-header success">
+            <div class="result-title">
+              <div class="result-nome">Contrato - DELETE</div>
+            </div>
+            <div class="result-badge success">
+              ✅ Passou
+            </div>
+          </div>
+
+          <div class="result-body">
+            
+              <div class="success-message">
+                ✅ Operação executada com sucesso!
+              </div>
+            
+
+            
+
+            <div class="meta-info">
+              <div class="meta-item">
+                ⏱️ 148ms
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="result-card">
+          <div class="result-header success">
+            <div class="result-title">
+              <div class="result-nome">Contratos Ativos - LIST</div>
+            </div>
+            <div class="result-badge success">
+              ✅ Passou
+            </div>
+          </div>
+
+          <div class="result-body">
+            
+              <div class="success-message">
+                ✅ Operação executada com sucesso!
+              </div>
+            
+
+            
+              <div class="details-section">
+                {
+  "count": 2,
+  "sample": {
+    "id": 13,
+    "numero_contrato": "CTR2025000013",
+    "imovel_id": 6,
+    "locatario_id": 6,
+    "fiador_id": null,
+    "tipo_locacao_id": 13,
+    "valor": 5326,
+    "caucao": null,
+    "valor_iptu": 103,
+    "valor_condominio": 710,
+    "data_inicio_contrato": "2025-06-11",
+    "data_fim_contrato": "2026-02-08",
+    "data_vencimento_aluguel": 10,
+    "indice_reajuste": "IGPM",
+    "periodicidade_reajuste": 12,
+    "data_ultimo_reajuste": null,
+    "status": "at
+              </div>
+            
+
+            <div class="meta-info">
+              <div class="meta-item">
+                ⏱️ 246ms
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="result-card">
+          <div class="result-header success">
+            <div class="result-title">
+              <div class="result-nome">Contratos por Imovel - LIST</div>
+            </div>
+            <div class="result-badge success">
+              ✅ Passou
+            </div>
+          </div>
+
+          <div class="result-body">
+            
+              <div class="success-message">
+                ✅ Operação executada com sucesso!
+              </div>
+            
+
+            
+              <div class="details-section">
+                {
+  "count": 0
+}
+              </div>
+            
+
+            <div class="meta-info">
+              <div class="meta-item">
+                ⏱️ 210ms
+              </div>
+            </div>
+          </div>
+        </div>
+      
+    </div>
+
+    <!-- Summary -->
+    
+      <div class="recommendations" style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);">
+        <h2>🎉 Parabéns! Todos os testes passaram!</h2>
+        <p style="color: #2e7d32; font-size: 16px; margin-top: 10px;">
+          Todos os testes de Relatório E2E: Contratos CRUD (Workflow Completo) foram executados com sucesso. O sistema está funcionando corretamente!
+        </p>
+      </div>
+    
+  </div>
+</body>
+</html>
+    

@@ -32,9 +32,12 @@ export function PessoaForm({ initialData, pessoaId, onSuccess, onCancel }: Pesso
     resolver: zodResolver(pessoaSchema) as any,
     defaultValues: initialData || {
       nome: '',
+      tipo: 'PF',
       data_nascimento: '',
       cpf: '',
       rg: '',
+      estado_civil: undefined,
+      nacionalidade: 'brasileiro(a)',
       email: '',
       telefone: '',
       observacoes: ''
@@ -96,6 +99,32 @@ export function PessoaForm({ initialData, pessoaId, onSuccess, onCancel }: Pesso
 
               <FormField
                 control={form.control}
+                name="tipo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Tipo <span className="text-destructive">*</span>
+                    </FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o tipo" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="PF">Pessoa Física (PF)</SelectItem>
+                        <SelectItem value="PJ">Pessoa Jurídica (PJ)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-2">
+              <FormField
+                control={form.control}
                 name="data_nascimento"
                 render={({ field }) => (
                   <FormItem>
@@ -107,9 +136,49 @@ export function PessoaForm({ initialData, pessoaId, onSuccess, onCancel }: Pesso
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="estado_civil"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Estado Civil</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o estado civil" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="solteiro(a)">Solteiro(a)</SelectItem>
+                        <SelectItem value="casado(a)">Casado(a)</SelectItem>
+                        <SelectItem value="divorciado(a)">Divorciado(a)</SelectItem>
+                        <SelectItem value="viúvo(a)">Viúvo(a)</SelectItem>
+                        <SelectItem value="união estável">União Estável</SelectItem>
+                        <SelectItem value="separado(a)">Separado(a)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="nacionalidade"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nacionalidade</FormLabel>
+                    <FormControl>
+                      <Input placeholder="brasileiro(a)" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="cpf"

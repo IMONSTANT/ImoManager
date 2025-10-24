@@ -724,7 +724,7 @@ export async function getContratos(
       ascending: params.sortOrder === 'asc'
     })
   } else {
-    query = query.order('criado_em', { ascending: false })
+    query = query.order('created_at', { ascending: false })
   }
 
   if (params?.page && params?.limit) {

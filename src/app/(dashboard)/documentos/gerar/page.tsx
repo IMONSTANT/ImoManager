@@ -13,7 +13,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   FileText,
@@ -111,32 +111,11 @@ const DOCUMENTO_DESCRICOES: Record<DocumentoTipo, string> = {
   D10: 'Comprovante de pagamento de aluguel',
 }
 
-/**
- * Extrai apenas o conteúdo dentro da tag <body> do HTML completo
- */
-function extractBodyContent(html: string): string {
-  const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i)
-  if (bodyMatch && bodyMatch[1]) {
-    return bodyMatch[1]
-  }
-  return html
-}
-
-/**
- * Extrai os estilos do <head> para aplicar no preview
- */
-function extractStyles(html: string): string {
-  const styleMatch = html.match(/<style[^>]*>([\s\S]*?)<\/style>/gi)
-  if (styleMatch) {
-    return styleMatch.join('\n')
-  }
-  return ''
-}
-
 export default function GerarDocumentoPage() {
   const router = useRouter()
   const { toast } = useToast()
   const supabase = createClient()
+  const iframeRef = useRef<HTMLIFrameElement>(null)
 
   // Estados do wizard
   const [step, setStep] = useState(1)
@@ -167,6 +146,20 @@ export default function GerarDocumentoPage() {
       carregarParcelasDoContrato()
     }
   }, [contratoId, step])
+
+  // Injeta HTML no iframe quando o preview muda
+  useEffect(() => {
+    if (iframeRef.current && previewHTML && step === 3) {
+      const iframe = iframeRef.current
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document
+
+      if (iframeDoc) {
+        iframeDoc.open()
+        iframeDoc.write(previewHTML)
+        iframeDoc.close()
+      }
+    }
+  }, [previewHTML, step])
 
   async function carregarDados() {
     try {
@@ -629,13 +622,13 @@ export default function GerarDocumentoPage() {
               <CardDescription>Visualização do conteúdo do documento</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="border rounded-lg max-h-96 overflow-y-auto bg-white">
-                {/* Injeta os estilos do documento */}
-                {extractStyles(previewHTML) && (
-                  <div dangerouslySetInnerHTML={{ __html: extractStyles(previewHTML) }} />
-                )}
-                {/* Renderiza apenas o conteúdo do body */}
-                <div dangerouslySetInnerHTML={{ __html: extractBodyContent(previewHTML) }} />
+              <div className="border rounded-lg overflow-hidden bg-white">
+                <iframe
+                  ref={iframeRef}
+                  className="w-full h-96 border-0"
+                  title="Preview do Documento"
+                  sandbox="allow-same-origin"
+                />
               </div>
             </CardContent>
           </Card>

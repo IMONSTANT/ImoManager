@@ -48,6 +48,7 @@ export const pessoaSchema = z.object({
   nome: z.string()
     .min(3, 'Nome deve ter pelo menos 3 caracteres')
     .max(120, 'Nome muito longo'),
+  tipo: z.enum(['PF', 'PJ'], { message: 'Selecione o tipo de pessoa' }).default('PF'),
   data_nascimento: z.string().optional(),
   cpf: z.string()
     .optional()
@@ -55,6 +56,8 @@ export const pessoaSchema = z.object({
       message: 'CPF inválido'
     }),
   rg: z.string().max(20, 'RG muito longo').optional(),
+  estado_civil: z.enum(['solteiro(a)', 'casado(a)', 'divorciado(a)', 'viúvo(a)', 'união estável', 'separado(a)']).optional(),
+  nacionalidade: z.string().max(50).default('brasileiro(a)'),
   profissao_id: z.coerce.number().int().positive().optional(),
   endereco_id: z.coerce.number().int().positive().optional(),
   email: z.string()

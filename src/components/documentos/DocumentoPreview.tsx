@@ -5,6 +5,7 @@
 
 'use client'
 
+import { useEffect, useRef } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -15,32 +16,6 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Button } from '@/components/ui/button'
 import { Download, Eye, X } from 'lucide-react'
-
-/**
- * Extrai apenas o conteúdo dentro da tag <body> do HTML completo
- * Isso é necessário porque dangerouslySetInnerHTML não aceita documentos HTML completos
- */
-function extractBodyContent(html: string): string {
-  // Tenta extrair conteúdo entre <body> e </body>
-  const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i)
-  if (bodyMatch && bodyMatch[1]) {
-    return bodyMatch[1]
-  }
-
-  // Se não encontrar body, retorna o HTML original (pode ser já um fragmento)
-  return html
-}
-
-/**
- * Extrai os estilos do <head> para aplicar no preview
- */
-function extractStyles(html: string): string {
-  const styleMatch = html.match(/<style[^>]*>([\s\S]*?)<\/style>/gi)
-  if (styleMatch) {
-    return styleMatch.join('\n')
-  }
-  return ''
-}
 
 interface DocumentoPreviewProps {
   open: boolean
@@ -59,9 +34,21 @@ export function DocumentoPreview({
   onDownloadPdf,
   onVisualizarPdf,
 }: DocumentoPreviewProps) {
-  // Extrai apenas o conteúdo do body e os estilos
-  const bodyContent = extractBodyContent(htmlContent)
-  const styles = extractStyles(htmlContent)
+  const iframeRef = useRef<HTMLIFrameElement>(null)
+
+  // Injeta o HTML completo no iframe quando o conteúdo muda
+  useEffect(() => {
+    if (iframeRef.current && htmlContent) {
+      const iframe = iframeRef.current
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document
+
+      if (iframeDoc) {
+        iframeDoc.open()
+        iframeDoc.write(htmlContent)
+        iframeDoc.close()
+      }
+    }
+  }, [htmlContent, open])
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -88,14 +75,14 @@ export function DocumentoPreview({
           )}
         </div>
 
-        <ScrollArea className="h-[60vh] border rounded-lg">
-          <div className="bg-white">
-            {/* Injeta os estilos do documento */}
-            {styles && <div dangerouslySetInnerHTML={{ __html: styles }} />}
-            {/* Renderiza apenas o conteúdo do body */}
-            <div dangerouslySetInnerHTML={{ __html: bodyContent }} />
-          </div>
-        </ScrollArea>
+        <div className="border rounded-lg overflow-hidden bg-white">
+          <iframe
+            ref={iframeRef}
+            className="w-full h-[60vh] border-0"
+            title="Preview do Documento"
+            sandbox="allow-same-origin"
+          />
+        </div>
       </DialogContent>
     </Dialog>
   )

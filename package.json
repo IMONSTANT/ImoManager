@@ -14,7 +14,18 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:watch": "vitest watch",
-    "test:templates": "ts-node scripts/test-templates.ts"
+    "test:templates": "ts-node scripts/test-templates.ts",
+    "test:e2e:all": "ts-node scripts/run-all-e2e-tests.ts",
+    "test:e2e:pessoas": "ts-node scripts/tests/cadastros/test-pessoas.ts",
+    "test:e2e:locadores": "ts-node scripts/tests/cadastros/test-locadores.ts",
+    "test:e2e:locatarios": "ts-node scripts/tests/cadastros/test-locatarios.ts",
+    "test:e2e:fiadores": "ts-node scripts/tests/cadastros/test-fiadores.ts",
+    "test:e2e:enderecos": "ts-node scripts/tests/cadastros/test-enderecos.ts",
+    "test:e2e:profissoes": "ts-node scripts/tests/cadastros/test-profissoes.ts",
+    "test:e2e:tipo-imovel": "ts-node scripts/tests/cadastros/test-tipo-imovel.ts",
+    "test:e2e:imoveis": "ts-node scripts/tests/imoveis/test-imoveis.ts",
+    "test:e2e:contratos": "ts-node scripts/tests/contratos/test-contratos.ts",
+    "test:e2e:cadastros": "npm run test:e2e:pessoas && npm run test:e2e:locadores && npm run test:e2e:locatarios && npm run test:e2e:fiadores && npm run test:e2e:enderecos && npm run test:e2e:profissoes && npm run test:e2e:tipo-imovel"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

@@ -16,10 +16,10 @@ export const MOCK_PAYLOADS: Record<DocumentoTipo, any> = {
     contrato_id: 10
   },
 
-  // D2 - Ficha Cadastro Fiador - Requer fiador
+  // D2 - Ficha Cadastro Fiador - Requer contrato com fiador
   D2: {
     tipo: 'D2',
-    fiador_id: 1  // Precisa existir no banco
+    contrato_id: 10  // Usa contrato mas sem fiador, vai falhar (esperado)
   },
 
   // D3 - Contrato de Locação - Requer contrato

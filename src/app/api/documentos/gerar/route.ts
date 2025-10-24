@@ -12,18 +12,31 @@ import { DOCUMENT_TEMPLATES } from '@/lib/templates/document-templates';
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-
-    // Verifica autenticação (bypass em modo de teste via header especial)
+    // Verifica se é modo de teste (bypass auth e RLS)
     const isTestMode = process.env.NODE_ENV === 'development' &&
                        request.headers.get('x-test-mode') === 'true';
 
+    let supabase: any;
     let user: any;
+
     if (isTestMode) {
-      // Modo de teste: usa usuário mock
+      // Modo de teste: usa service_role para bypass RLS
+      const { createClient: createServiceClient } = await import('@supabase/supabase-js');
+      supabase = createServiceClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        {
+          auth: {
+            autoRefreshToken: false,
+            persistSession: false
+          }
+        }
+      );
       user = { id: 'test-user-id' };
-      console.log('⚠️  MODO DE TESTE: Autenticação bypassed');
+      console.log('⚠️  MODO DE TESTE: Autenticação bypassed + RLS bypassed (service_role)');
     } else {
+      // Modo normal: usa cliente SSR com auth
+      supabase = await createClient();
       const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
       if (authError || !authUser) {
         return NextResponse.json(
@@ -154,6 +167,19 @@ export async function POST(request: NextRequest) {
     };
 
     const documentoGerado = await DocumentoService.gerarDocumento(input, modeloMock as any);
+
+    // Em modo de teste, retorna diretamente sem salvar no banco
+    if (isTestMode) {
+      return NextResponse.json({
+        success: true,
+        documento: {
+          tipo: documentoGerado.tipo,
+          numero_documento: `TEST-${tipo}-${Date.now()}`,
+          conteudo_html: documentoGerado.conteudo_html,
+          dados_documento: documentoGerado.dados_documento
+        }
+      });
+    }
 
     // Gera número de documento
     const { data: numeroData } = await supabase
